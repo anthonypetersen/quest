@@ -5,65 +5,69 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Quest PRB</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+        
+        <link href="index.css" rel="stylesheet" type="text/css">
+        <link id="pagestyle" href="Default.css" rel="stylesheet" type="text/css">
+        <link id="pagelogic" href="Default.css" rel="stylesheet" type="text/css">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.7.3/localforage.min.js"></script>
     </head>
 
     <body>
 
-        <div id="navBar" style="margin-bottom: 10px;">
-            <h1>Quest PBR</h1>
-        </div>
-
-        <div class="container-fluid" id="tool">
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-6 my-2" id="loadSaveDiv" style="border: 1px solid black;">
-                    <h3>Questionnaire Options</h3>
-                    <input id="file" type="file" aria-label="Choose File" style="margin-top: 15px;" onchange="onFileSelected(event)">
-                    <br>
-                    <span>Enter URL:</span>
-                    <input id="url" style="margin-top: 10px;" aria-label="url" onchange="submitURL()">
-                    <input type="submit" aria-label="submit" onclick="submitURL()"></input>
-                    <br>
-                    <span>File Name:</span>
-                    <input id="tb" aria-label="File Name" style="margin-top: 10px;">
-                    <span>.txt</span>
-                    <button aria-label="Save" onclick="saveDoc()">Save</button>
-                    <br>
-                    <span>Upload Questionnaire:</span>
-                    <button style="margin-top: 10px;" aria-label="Upload" onclick="goToLink()">Upload</button>
+                <div class="col">
+                    <div class="row" id="options">
+                        <h4>Options</h4>
+                        <div class="row">
+                            <!--
+                                <input type="file" aria-label="Choose File" onchange="onFileSelected(event)">
+
+                            <span>Enter URL:</span>
+                            <input id="url" aria-label="url" onchange="submitURL()">
+                            <input type="submit" aria-label="submit" onclick="submitURL()"></input>
+                            -->
+
+                            <select id="file">
+                                <option value="upload">Upload File</option>
+                                <option value="url">URL</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                                <textarea id="json_input" aria-label="json input" style="width: 100%; height:100px"></textarea>
+                                <div class="col">
+                                    <input type="button" id="updater" value="add JSON to memory" />
+                                    <input type="button" id="clearMem" value="Clear Memory" />
+                                    <div id="loaddisplay" style="height: 20px;"></div>
+                                </div>
+                        </div>
+                        <div class="row">
+                            <input type="checkbox" id="styling" onclick="changeStyle()">Styling</input>
+                            <input type="checkbox" id="logic" onclick="changeLogic()">Logic</input>
+                            <span id="fontSpan" class="h5">Change Font Size <span
+                                class="h5 align-middle"><button id="increaseSizeButton" aria-label="increaseSize" class="fa fa-plus-square-o"></button> <button id="decreaseSizeButton" aria-label="decreaseSize"
+                                    class="fa fa-minus-square-o"></button></span></span>
+                        </div>
+                    </div>
+                    <div class="row" id="markup">
+                        <span class="h4">Markup (<a href="#questionnaires/demo.txt" id="demo">Demo</a>) </span>
+                        <textarea id="ta" aria-label="Enter Text"></textarea>
+                    </div>
                 </div>
-                <div class="col-sm-3 my-2" id="stylingDiv" style="border: 1px solid black; border-right:0;">
-                    <h3>Styling</h3>
-                    <input type="radio" id="styling_default" class="styling" name="styling" onclick="changeStyle('Default.css')" checked aria-label='No Style'> No Style</input>
-                    <input type="radio" id="styling_style1" class="styling" name="styling" onclick="changeStyle('Style1.css')" aria-label='With Style 1'> With Style 1</input>
-        
-                    <h3>Logic</h3>
-                    <input type="radio" id="logic_default" class="styling" name="logic" onclick="changeLogic('Default.css')" checked aria-label="Not Active"> Not Active</input>
-                    <input type="radio" id="logic_active" class="styling" name="logic" onclick="changeLogic('ActiveLogic.css')" aria-label="Active"> Active</input>
-                </div>
-                <div class="col-sm-3 my-2" id="prevResDiv" style="border: 1px solid black;border-left:0">
-                    <h3>Previous Results</h3>
-                    <textarea id="json_input" aria-label="json input" style="width: 100%; height:200px"></textarea>
-                    <div class="col" style="margin-top: 10px;">
-                        <input type="button" id="updater" value="add JSON to memory" />
-                        <input type="button" id="clearMem" value="Clear Memory" />
-                        <div id="loaddisplay" style="height: 20px;"></div>
+                <div class="col-8">
+                    <div class="col" id="render">
+                        <h4>Rendering</h3>
+                        <div id="rendering"></div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col" id="markup">
-                    <span class="h3">Markup (<a href="#questionnaires/demo.txt" id="demo">Demo</a>) </span> <span id="fontSpan" class="h5" style="float:right;">Change Font Size <span
-                            class="h5 align-middle"><button id="increaseSizeButton" aria-label="increaseSize" class="fa fa-plus-square-o"></button> <button id="decreaseSizeButton" aria-label="decreaseSize"
-                                class="fa fa-minus-square-o"></button></span></span>
-                    <textarea id="ta" aria-label="Enter Text"></textarea>
-                </div>
-                <div class="col">
-                    <h3 id="renderText" style="color: navy;">Rendering</h3>
-                    <div id="rendering"></div>
-                </div>
-            </div>
         </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+        <script src="index.js"></script>
+        <script src="quest.js" type="module"></script>
     </body>
