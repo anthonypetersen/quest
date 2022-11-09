@@ -12,6 +12,11 @@
     margin: 10px;
 }
 
+#prev {
+    height: 200px;
+    width: 100%;
+}
+
 #markup {
     border-radius: 25px;
     border: 2px solid #000000;
@@ -30,4 +35,16 @@
     padding: 25px;
     margin: 5px;
     height: 100%;
+}
+
+#fontSpan {
+    float: right;
+}
+
+#checkboxSpan {
+    float: right;
+}
+
+#buttonSpan {
+    float: right;
 }
