@@ -138,6 +138,7 @@ transform.render = async (obj, divId, previousResults = {}) => {
     questText = questText.replace(/\u001f/g, "\n");
     questText = questText.replace(/(?:\r\n|\r|\n)/g, "<br>");
     questText = questText.replace(/\[_#\]/g, "");
+    // this is to provide "default values" to checkboxes (within a question) if none are provided
     let counter = 1;
     questText = questText.replace(/\[\]/g, function (x) {
       let t = "[" + counter.toString() + "]";
