@@ -1,5 +1,4 @@
-import { transform } from "./replace2.js";
-//import { questionQueue, moduleParams } from "./questionnaire.js";
+import { transform } from "./render.js";
 
 async function quest() {
     
