@@ -1,5 +1,6 @@
 import {
     questionQueue,
+    queue,
     nextClick,
     previousClicked,
     moduleParams,
@@ -695,6 +696,18 @@ import {
       if (!questText.includes('input') && (questID !== 'END')) {
         resetButton = '';
       }
+
+      queue.add({
+        "id":       questID,
+        "options":  questOpts,
+        "args":     questArgs,
+        "text":     questText,
+        "soft":     softBool,
+        "hard":     hardBool,
+        "previous": prevButton,
+        "reset":    resetButton,
+        "next":     nextButton
+      });
   
   
       let rv = `<form class='question' id='${questID}' ${questOpts} ${questArgs} novalidate hardEdit='${hardBool}' softEdit='${softBool}'>${questText}<div>
@@ -1010,6 +1023,8 @@ import {
     
     if (moduleParams.soccer instanceof Function)
       moduleParams.soccer();
+
+      
     moduleParams.questName = questName;
     return true;
   };

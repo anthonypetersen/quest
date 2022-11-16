@@ -1,4 +1,5 @@
 import { Tree } from "./tree.js";
+import { Queue } from "./queue.js";
 import { knownFunctions } from "./knownFunctions.js";
 import { removeQuestion } from "./localforageDAO.js";
 import { validateInput, validationError } from "./validate.js"
@@ -293,7 +294,7 @@ window.addEventListener("load", (event) => {
 // The questionQueue is an Tree which contains
 // the question ids in the order they should be displayed.
 export const questionQueue = new Tree();
-
+export const queue = new Queue();
 export function isFirstQuestion() {
   return questionQueue.isEmpty() || questionQueue.isFirst();
 }
@@ -1363,3 +1364,4 @@ export function evaluateCondition(txt) {
 }
 window.evaluateCondition = evaluateCondition
 window.questionQueue = questionQueue
+window.queue = queue
