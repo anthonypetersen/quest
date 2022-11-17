@@ -55,3 +55,10 @@ function clearMemory() {
 
 
 }
+
+async function getURL() {
+
+    let url = "https://raw.githubusercontent.com/episphere/quest/main/questionnaires/demo.txt";
+    ta.value = await (await fetch(url)).text();
+    ta.onkeyup();
+}
