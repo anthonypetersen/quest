@@ -1,8 +1,8 @@
 import { Tree } from "./tree.js";
-import { Container } from "./container.js";
+import { Survey } from "./survey.js";
 import { knownFunctions } from "./knownFunctions.js";
 import { removeQuestion } from "./localforageDAO.js";
-import { validateInput, validationError } from "./validate.js"
+import { validateInput, validationError } from "./validate.js";
 
 export const moduleParams = {};
 
@@ -294,7 +294,7 @@ window.addEventListener("load", (event) => {
 // The questionQueue is an Tree which contains
 // the question ids in the order they should be displayed.
 export const questionQueue = new Tree();
-export const container = new Container();
+export const survey = new Survey();
 export function isFirstQuestion() {
   return questionQueue.isEmpty() || questionQueue.isFirst();
 }
@@ -799,6 +799,7 @@ function getNextQuestionId(currentFormElement) {
     // We are at the end of the question queue...
     // get the next element from the markdown...
     let tmp = currentFormElement.nextElementSibling;
+    tmp = survey.next();
     // we are at a question that should be displayed add it to the queue and
     // make it the current node.
     questionQueue.add(tmp.id);
@@ -873,7 +874,7 @@ async function nextPage(norp, retrieve, store, rootElement) {
 
   let nextQuestionId = getNextQuestionId(questionElement);
   // get the actual HTML element.
-  let nextElement = document.getElementById(nextQuestionId.value);
+  let nextElement = survey.render(survey.find(nextQuestionId.value));
 
   nextElement = exitLoop(nextElement);
 
@@ -1076,7 +1077,7 @@ export async function previousClicked(norp, retrieve, store, rootElement) {
   while (pv.value.value.substring(0, 9) == "_CONTINUE") {
     pv = questionQueue.previous();
   }
-  let prevElement = document.getElementById(pv.value.value);
+  let prevElement = survey.render(survey.find(pv.value.value), document.getElementById(rootElement));
   norp.form.classList.remove("active");
   displayQuestion(prevElement)
 
@@ -1266,18 +1267,9 @@ function getResults(element) {
 // x is the questionnaire text
 
 export function evaluateCondition(txt) {
-  let mjsfun = Object.getOwnPropertyNames(myFunctions)
 
   txt = decodeURIComponent(txt)
   console.log("evaluateCondition: ===>", txt)
-  // if someone passes (#currentYear - 2), this becomes 2022 - 2.
-  // we need to evaluate this to 2020...
-  //  if (mjsfun.some(f => txt.includes(f)) ||
-  //    (/^\s*[\(\d][\(\)\s\+\-\*\/\d]+[\d\)]$/.test(txt))) {
-  //    let v = math.evaluate(txt)
-  //    console.log(`${txt} ==> ${v}`)
-  //    return v
-  //  }
 
   // try to evaluate using mathjs...
   // if we fail, fall back to old evaluation...
@@ -1364,4 +1356,4 @@ export function evaluateCondition(txt) {
 }
 window.evaluateCondition = evaluateCondition
 window.questionQueue = questionQueue
-window.container = container
+window.survey = survey

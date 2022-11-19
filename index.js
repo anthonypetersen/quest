@@ -58,7 +58,7 @@ function clearMemory() {
 
 async function getURL() {
 
-    let url = "https://raw.githubusercontent.com/episphere/quest/main/questionnaires/demo.txt";
+    let url = "https://raw.githubusercontent.com/episphere/questionnaire/main/module1Stage.txt";
     ta.value = await (await fetch(url)).text();
     ta.onkeyup();
 }
