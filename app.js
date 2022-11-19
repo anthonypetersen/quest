@@ -1,4 +1,4 @@
-import { transform } from "./render.js";
+import { transform } from "./parse.js";
 
 async function quest() {
     
@@ -6,7 +6,7 @@ async function quest() {
 
     ta.onkeyup = (event) => {
         transform.tout((previousResults) => {
-            transform.render(
+            transform.parse(
                 {
                     text: ta.value,
                 },

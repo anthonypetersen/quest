@@ -684,9 +684,7 @@ function setNumberOfQuestionsInModal(num, norp, retrieve, store, soft) {
   let prompt = `There ${num > 1 ? "are" : "is"} ${num} question${num > 1 ? "s" : ""
     } unanswered on this page. `;
   if (!soft) {
-    document.getElementById(
-      "hardModalBodyText"
-    ).innerText = `${prompt} Please answer the question${num > 1 ? "s" : ""}.`;
+    document.getElementById("hardModalBodyText").innerText = `${prompt} Please answer the question${num > 1 ? "s" : ""}.`;
     $("#hardModal").modal("toggle");
     return null;
   }

@@ -1,6 +1,6 @@
-import { questionQueue, survey, nextClick, previousClicked, moduleParams, textBoxInput, handleXOR, displayQuestion, parseSSN, parsePhoneNumber, submitQuestionnaire } from "./questionnaire.js";
+import { questionQueue, survey, nextClick, previousClicked, moduleParams, displayQuestion, submitQuestionnaire } from "./questionnaire.js";
 import { restoreResults } from "./localforageDAO.js";
-import { parseGrid, grid_replace_regex, toggle_grid } from "./buildGrid.js";
+import { parseGrid, grid_replace_regex } from "./buildGrid.js";
 import { clearValidationError } from "./validate.js";
 import { modals } from "./constants.js";
 
@@ -9,7 +9,7 @@ export let transform = function () {};
 let questName = "Questionnaire";
 let rootElement;
   
-transform.render = async (obj, divId, previousResults = {}) => {
+transform.parse = async (obj, divId, previousResults = {}) => {
     
     moduleParams.renderObj = obj;
     moduleParams.previousResults = previousResults;
@@ -217,9 +217,9 @@ transform.render = async (obj, divId, previousResults = {}) => {
         fPopover
         );
         function fPopover(fullmatch, buttonText, title, popText) {
-        title = title ? title : "";
-        popText = popText.replace(/"/g, "&quot;")
-        return `<a tabindex="0" class="popover-dismiss btn btn" role="button" data-toggle="popover" data-trigger="focus" title="${title}" data-content="${popText}">${buttonText}</a>`;
+            title = title ? title : "";
+            popText = popText.replace(/"/g, "&quot;")
+            return `<a tabindex="0" class="popover-dismiss btn btn" role="button" data-bs-toggle="popover" data-bs-trigger="focus" title="${title}" data-bs-content="${popText}">${buttonText}</a>`;
         }
 
         // replace |hidden|value| 
@@ -711,31 +711,25 @@ transform.render = async (obj, divId, previousResults = {}) => {
 
 
     document.getElementById(divId).innerHTML = modals();
-
-
-    // If a user starts a module takes a break
-    // and comes back...  get the tree out of the
-    // local forage if it exists and fill out
-    // the forms.  This functionality is needed
-    // for the back/next functionality.
+    
     async function fillForm(retrieve) {
         let questObj = {};
 
         if (retrieve) {
             const response = await retrieve();
             if (response.code === 200) {
-            const userData = response.data;
-            console.log("retrieve module name===", moduleParams.questName);
-            if (userData[moduleParams.questName]) {
-                questObj = userData[moduleParams.questName];
-                console.log("questObj===", questObj);
-                await restoreResults(questObj);
+                const userData = response.data;
+                console.log("retrieve module name===", moduleParams.questName);
+
+                if (userData[moduleParams.questName]) {
+                    questObj = userData[moduleParams.questName];
+                    console.log("questObj===", questObj);
+                    await restoreResults(questObj);
+                }
             }
-            }
-        } else {
-            // a retrieve function is not defined use
-            // the default which pull the values out of
-            // localforage...
+        } 
+        else {
+
             let results = await localforage.getItem(questName);
 
             if (results == null) results = {};
@@ -770,7 +764,8 @@ transform.render = async (obj, divId, previousResults = {}) => {
 
     if (obj.treeJSON) {
         questionQueue.loadFromJSON(obj.treeJSON)
-    } else {
+    } 
+    else {
         await localforage.getItem(questName + ".treeJSON").then((tree) => {
             if (tree) {
                 questionQueue.loadFromVanillaObject(tree);
@@ -782,63 +777,7 @@ transform.render = async (obj, divId, previousResults = {}) => {
     }
 
     resetTree();
-    /*
-    let questions = [...document.getElementsByClassName("question")];
 
-
-
-    [...divElement.querySelectorAll("input")].forEach((inputElement) => {
-        inputElement.addEventListener("keydown", (event) => {
-        if (event.keyCode == 13) {
-            event.preventDefault();
-        }
-        });
-    });
-
-    let textInputs = [
-        ...divElement.querySelectorAll(
-        "input[type='text'],input[type='number'],input[type='email'],input[type='tel'],input[type='date'],input[type='month'],input[type='time'],textarea,select"
-        ),
-    ];
-
-    textInputs.forEach((inputElement) => {
-        inputElement.onblur = textBoxInput;
-        inputElement.setAttribute("style", "size: 20 !important");
-    });
-
-    // for each element with an xor, handle the xor on keydown
-    Array.from(document.querySelectorAll("[xor]")).forEach(xorElement => {
-        xorElement.addEventListener("keydown", () => handleXOR(xorElement));
-    })
-
-    let SSNInputs = [...divElement.querySelectorAll(".SSN")];
-    SSNInputs.forEach((inputElement) => {
-        inputElement.addEventListener("keyup", parseSSN);
-
-    });
-
-    let phoneInputs = [...divElement.querySelectorAll("input[type='tel']")];
-    phoneInputs.forEach((inputElement) =>
-        inputElement.addEventListener("keyup", parsePhoneNumber)
-    );
-
-    [...divElement.querySelectorAll(".grid-input-element")].forEach((x) => {
-        x.addEventListener("change", toggle_grid);
-    });
-
-    [...divElement.querySelectorAll("[data-hidden]")].forEach((x) => {
-        x.style.display = "none";
-    });
-
-    $(".popover-dismiss").popover({
-        trigger: "focus",
-    });
-
-    // [...document.querySelectorAll(".response")].map((elm) => {
-    //   if (elm.nextSibling.tagName == "BR") {
-    //     elm.nextSibling.remove();
-    //   }
-    // });
 
     document.getElementById("submitModalButton").onclick = () => {
         let lastBackButton = document.getElementById('lastBackButton');
@@ -852,7 +791,6 @@ transform.render = async (obj, divId, previousResults = {}) => {
         submitQuestionnaire(moduleParams.renderObj.store, questName);
     };
 
-    */
 
 
     if (moduleParams.soccer instanceof Function)

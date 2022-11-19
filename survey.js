@@ -1,5 +1,6 @@
-import { stopSubmit } from "./render.js";
-import { rbAndCbClick } from "./questionnaire.js";
+import { stopSubmit } from "./parse.js";
+import { rbAndCbClick, textBoxInput, handleXOR, parseSSN, parsePhoneNumber, } from "./questionnaire.js";
+import { toggle_grid } from "./buildGrid.js";
 
 export class Survey {
     constructor() {
@@ -80,19 +81,55 @@ export class Survey {
         }
 
         if(this.isLast(item)) {
-            buttonToRemove = element.querySelector(".next");
+            let buttonToRemove = element.querySelector(".next");
             if (buttonToRemove) {
             buttonToRemove.remove();
             }
         }
 
-        let rbCb = [
-            ...element.querySelectorAll(
-            "input[type='radio'],input[type='checkbox'] "
-            ),
-        ];
-        rbCb.forEach((rcElement) => {
-            rcElement.onchange = rbAndCbClick;
+        element.querySelectorAll("input[type='text'],input[type='number'],input[type='email'],input[type='tel'],input[type='date'],input[type='month'],input[type='time'],textarea,select")
+            .forEach((inputElement) => {
+                inputElement.onblur = textBoxInput;
+                inputElement.setAttribute("style", "size: 20 !important");
+        });
+
+        element.querySelectorAll("input[type='radio'],input[type='checkbox'] ")
+            .forEach((rcElement) => {
+                rcElement.onchange = rbAndCbClick;
+        });
+
+        element.querySelectorAll("input").forEach((inputElement) => {
+            inputElement.addEventListener("keydown", (event) => {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+        //document?
+        Array.from(document.querySelectorAll("[xor]")).forEach(xorElement => {
+            xorElement.addEventListener("keydown", () => handleXOR(xorElement));
+        })
+
+        element.querySelectorAll(".SSN").forEach((inputElement) => {
+            inputElement.addEventListener("keyup", parseSSN);
+
+        });
+
+        element.querySelectorAll("input[type='tel']").forEach((inputElement) => {
+            inputElement.addEventListener("keyup", parsePhoneNumber)
+        });
+
+        element.querySelectorAll(".grid-input-element").forEach((x) => {
+            x.addEventListener("change", toggle_grid);
+        });
+
+        element.querySelectorAll("[data-hidden]").forEach((x) => {
+            x.style.display = "none";
+        });
+
+        $(".popover-dismiss").popover({
+            trigger: "focus",
         });
     }
 
