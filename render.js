@@ -1,4 +1,4 @@
-import { questionQueue, survey, nextClick, previousClicked, moduleParams, rbAndCbClick, textBoxInput, handleXOR, displayQuestion, parseSSN, parsePhoneNumber, submitQuestionnaire } from "./questionnaire.js";
+import { questionQueue, survey, nextClick, previousClicked, moduleParams, textBoxInput, handleXOR, displayQuestion, parseSSN, parsePhoneNumber, submitQuestionnaire } from "./questionnaire.js";
 import { restoreResults } from "./localforageDAO.js";
 import { parseGrid, grid_replace_regex, toggle_grid } from "./buildGrid.js";
 import { clearValidationError } from "./validate.js";
@@ -9,64 +9,59 @@ export let transform = function () {};
 let questName = "Questionnaire";
 let rootElement;
   
-  
 transform.render = async (obj, divId, previousResults = {}) => {
+    
     moduleParams.renderObj = obj;
     moduleParams.previousResults = previousResults;
     moduleParams.soccer = obj.soccer;
-    rootElement = divId;
-    let contents = "";
 
+    rootElement = divId;
     let divElement = document.getElementById(divId);
 
     survey.clear();
 
-    // allow the client to reset the tree...
+    let contents = "";
 
     if (obj.text) contents = obj.text;
 
     if (obj.url) {
+
         contents = await (await fetch(obj.url)).text();
         moduleParams.config = contents
+
         if (obj.activate) {
-        const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href = "https://episphere.github.io/quest/ActiveLogic.css";
-        document.head.appendChild(link);
-        const link2 = document.createElement("link");
-        link2.rel = "stylesheet";
-        link2.href = "https://episphere.github.io/quest/Style1.css";
-        document.head.appendChild(link2);
+            const link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = "https://episphere.github.io/quest/ActiveLogic.css";
+            document.head.appendChild(link);
+
+            const link2 = document.createElement("link");
+            link2.rel = "stylesheet";
+            link2.href = "https://episphere.github.io/quest/Style1.css";
+            document.head.appendChild(link2);
         }
     }
-    // first... build grids...
+
     contents = contents.replace(grid_replace_regex, parseGrid);
-
-    // then we must unroll the loops...
-
     contents = unrollLoops(contents);
 
-    // #issue 378, note: getMonth 0=Jan,  need to add 1
-    contents = contents.replace(/#currentMonthStr/g, ["Jan", "Feb", "Mar", 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][new Date().getMonth()]);
-    let current_date = new Date()
     Date.prototype.toQuestFormat = function () { return `${this.getFullYear()}-${this.getMonth() + 1}-${this.getDate()}` }
+    let current_date = new Date();
+    
+    contents = contents.replace(/#currentMonthStr/g, ["Jan", "Feb", "Mar", 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][new Date().getMonth()]);
     contents = contents.replace(/#currentMonth/g, current_date.getMonth() + 1);
     contents = contents.replace(/#currentYear/g, current_date.getFullYear());
-    // issue #405 need #today and today+/- n days...
     contents = contents.replace(/#today(\s*[+\-]\s*\d+)?/g, function (match, offset) {
-        // if no (+/- offset) we want today...
+        
         if (!offset || offset.trim().length == 0) {
-        return current_date.toQuestFormat()
+            return current_date.toQuestFormat()
         }
 
-        // otherwise +/- the offset in number of days...
         offset = parseInt(offset.replace(/\s/g, ""));
         let offset_date = new Date()
         offset_date.setDate(offset_date.getDate() + offset)
         return offset_date.toQuestFormat()
-    })
-
-    // questionnarie 
+    });
 
     // hey, lets de-lint the contents..
     // convert (^|\n{2,}Q1. to [Q1]
@@ -75,17 +70,15 @@ transform.render = async (obj, divId, previousResults = {}) => {
 
     contents = contents.replace(/\/\*.*\*\//g, "");
     contents = contents.replace(/\/\/.*/g, "");
-    // contents = contents.replace(/\[DISPLAY IF .*\]/gms, "");
+
     let nameRegex = new RegExp(/{"name":"(\w*)"}/);
     if (nameRegex.test(contents)) {
-        contents = contents.replace(/{"name":"(\w*)"}/, fQuestName);
-        function fQuestName(group, name) {
-        questName = name;
-        moduleParams.questName = name;
-        return "";
-        }
-    } else {
-        questName = "Questionnaire";
+        
+        contents = contents.replace(/{"name":"(\w*)"}/, function (group, name) {
+            questName = name;
+            moduleParams.questName = name;
+            return "";
+        });
     }
 
 
@@ -696,7 +689,6 @@ transform.render = async (obj, divId, previousResults = {}) => {
     }
 
     const regEx = new RegExp("\\[([A-Z_][A-Z0-9_#]*[\\?\\!]?)(?:\\|([^,\\|\\]]+)\\|)?(,.*?)?\\](.*?)(?=$|\\[[_A-Z]|<form)","g");
-
     contents = contents.replace(regEx, function (page, questID, questOpts, questArgs, questText) {
         survey.add({
             id: questID,
@@ -716,15 +708,10 @@ transform.render = async (obj, divId, previousResults = {}) => {
 
     //removing random &#x1f; unit separator chars
     contents = contents.replace(//g, "");
-    // add the HTML/HEAD/BODY tags...
+
 
     document.getElementById(divId).innerHTML = modals();
 
-    // if (obj.url && obj.url.split("&").includes("run")) {
-    //   if (document.querySelector(".question") != null) {
-    //     document.querySelector(".question").classList.add("active");
-    //   }
-    // }
 
     // If a user starts a module takes a break
     // and comes back...  get the tree out of the
@@ -758,75 +745,47 @@ transform.render = async (obj, divId, previousResults = {}) => {
 
     function resetTree() {
         if (survey.get().length > 0) {
-
+    
             let question;
-
             let qid = questionQueue.currentNode.value;
-            let questionFound = survey.find(qid);
-            
-            if (questionFound) {
-                console.log(` ==============>>>>  setting ${questionFound.id} active`);
-
-                question = survey.render(questionFound, divElement);
-            } 
+    
+            if (qid) {
+                question = survey.find(qid);
+            }
             else {
-                console.log(` ==============>>>>  setting the first question ${survey.get()[0].id} active`);
-        
                 questionQueue.add(survey.get()[0].id);
                 questionQueue.next();
-
-                question = survey.render(survey.first(), divElement);
+    
+                question = survey.first();
             }
-
-            displayQuestion(question);
+    
+            console.log(` ==============>>>>  setting ${question.id} active`);
+    
+            let rendered = survey.render(question, divElement);
+            displayQuestion(rendered);
         }
     }
 
-
-    // wait for the objects to be retrieved,
-    // then reset the tree.
     await fillForm(obj.retrieve);
 
-    // get the tree from either 1) the client or 2) localforage..
-    // either way, we always use the version in LF...
     if (obj.treeJSON) {
         questionQueue.loadFromJSON(obj.treeJSON)
     } else {
         await localforage.getItem(questName + ".treeJSON").then((tree) => {
-        // if this is the first time the user attempt
-        // the questionnaire, the tree will not be in
-        // the localForage...
-        if (tree) {
-            questionQueue.loadFromVanillaObject(tree);
-        } else {
-            questionQueue.clear();
-        }
+            if (tree) {
+                questionQueue.loadFromVanillaObject(tree);
+            } 
+            else {
+                questionQueue.clear();
+            }
         });
     }
+
+    resetTree();
     /*
     let questions = [...document.getElementsByClassName("question")];
 
-    if (questions.length > 0) {
-        let buttonToRemove = questions[0].querySelector(".previous");
-        if (buttonToRemove) {
-        buttonToRemove.remove();
-        }
-        buttonToRemove = [...questions].pop().querySelector(".next");
-        if (buttonToRemove) {
-        buttonToRemove.remove();
-        }
-    }
 
-    questions.forEach((question) => {
-        question.onsubmit = stopSubmit;
-    });
-    divElement
-        .querySelectorAll("input[type='submit']")
-        .forEach((submitButton) => {
-        submitButton.addEventListener("click", (event) => {
-            event.target.form.clickType = event.target.value;
-        });
-        });
 
     [...divElement.querySelectorAll("input")].forEach((inputElement) => {
         inputElement.addEventListener("keydown", (event) => {
@@ -863,15 +822,6 @@ transform.render = async (obj, divId, previousResults = {}) => {
         inputElement.addEventListener("keyup", parsePhoneNumber)
     );
 
-    let rbCb = [
-        ...divElement.querySelectorAll(
-        "input[type='radio'],input[type='checkbox'] "
-        ),
-    ];
-    rbCb.forEach((rcElement) => {
-        rcElement.onchange = rbAndCbClick;
-    });
-
     [...divElement.querySelectorAll(".grid-input-element")].forEach((x) => {
         x.addEventListener("change", toggle_grid);
     });
@@ -904,7 +854,6 @@ transform.render = async (obj, divId, previousResults = {}) => {
 
     */
 
-    resetTree();
 
     if (moduleParams.soccer instanceof Function)
         moduleParams.soccer();
@@ -914,118 +863,94 @@ transform.render = async (obj, divId, previousResults = {}) => {
     return true;
 };
   
-  function ordinal(a) {
+function ordinal(a) {
     if (Number.isInteger(a)) {
-      switch (a % 10) {
+        switch (a % 10) {
         case 1: return ((a % 100) == 11 ? `${a}th` : `${a}st`);
         case 2: return ((a % 100) == 12 ? `${a}th` : `${a}nd`);
         case 3: return ((a % 100) == 13 ? `${a}th` : `${a}rd`);
         default: return (`${a}th`)
-      }
+        }
     }
     return ""
+
+}
   
-  }
-  function unrollLoops(txt) {
+function unrollLoops(txt) {
     // all the questions in the loops...
     // each element in res is a loop in the questionnaire...
     let loopRegex = /<loop max=(\d+)\s*>(.*?)<\/loop>/gm;
     txt = txt.replace(/(?:\r\n|\r|\n)/g, "\xa9");
     let res = [...txt.matchAll(loopRegex)].map(function (x, indx) {
-      return { cnt: x[1], txt: x[2], indx: indx + 1, orig: x[0] };
+        return { cnt: x[1], txt: x[2], indx: indx + 1, orig: x[0] };
     });
-  
+
     let idRegex = /\[([A-Z_][A-Z0-9_#]*)[?!]?(?:\|([^,\|\]]+)\|)?(,.*?)?\]/gm;
     let disIfRegex = /displayif=.*?\(([A-Z_][A-Z0-9_#]*),.*?\)/g;
     // we have an array of objects holding the text..
     // get all the ids...
     let cleanedText = res.map(function (x) {
-      x.txt = x.txt.replace("firstquestion", `loopindx=${x.indx} firstquestion`);
-      x.txt += "[_CONTINUE" + x.indx + ",displayif=setFalse(-1,#loop)]";
-      x.txt = x.txt.replace(/->\s*_CONTINUE\b/g, "-> _CONTINUE" + x.indx);
-      let ids = [...x.txt.matchAll(idRegex)].map((y) => ({
+        x.txt = x.txt.replace("firstquestion", `loopindx=${x.indx} firstquestion`);
+        x.txt += "[_CONTINUE" + x.indx + ",displayif=setFalse(-1,#loop)]";
+        x.txt = x.txt.replace(/->\s*_CONTINUE\b/g, "-> _CONTINUE" + x.indx);
+        let ids = [...x.txt.matchAll(idRegex)].map((y) => ({
         label: y[0],
         id: y[1],
         indx: x.indx,
-      }));
-      let disIfIDs = [...x.txt.matchAll(disIfRegex)].map((disIfID) => ({
+        }));
+        let disIfIDs = [...x.txt.matchAll(disIfRegex)].map((disIfID) => ({
         label: disIfID[0],
         id: disIfID[1],
-      }));
-      disIfIDs = disIfIDs.map((x) => x.id);
-      let newIds = ids.map((x) => x.id);
-  
-      // find all ids defined within the loop,
-      // note: textboxes are an outlier that needs
-      //       to be fixed.
-      let idsInLoop = Array.from(x.txt.matchAll(/\|[\w\s=]*id=(\w+)|___\|\s*(\w+)|textbox:\s*(\w+)/g)).map(x => {
+        }));
+        disIfIDs = disIfIDs.map((x) => x.id);
+        let newIds = ids.map((x) => x.id);
+
+        // find all ids defined within the loop,
+        // note: textboxes are an outlier that needs
+        //       to be fixed.
+        let idsInLoop = Array.from(x.txt.matchAll(/\|[\w\s=]*id=(\w+)|___\|\s*(\w+)|textbox:\s*(\w+)/g)).map(x => {
         return x[1] ? x[1] : (x[2] ? x[2] : x[3])
-      })
-  
-      // goto from 1-> max for human consumption... need <=
-      let loopText = "";
-      for (var loopIndx = 1; loopIndx <= x.cnt; loopIndx++) {
+        })
+
+        // goto from 1-> max for human consumption... need <=
+        let loopText = "";
+        for (var loopIndx = 1; loopIndx <= x.cnt; loopIndx++) {
         var currentText = x.txt;
         // replace all instances of the question ids with id_#
         ids.map(
-          (id) =>
-          (currentText = currentText.replace(
+            (id) =>
+            (currentText = currentText.replace(
             new RegExp("\\b" + id.id + "\\b(?!\#)", "g"),
             `${id.id}_${loopIndx}_${loopIndx}`
-          ))
+            ))
         );
         //replace all idsInLoop in the loop with {$id_$loopIndx}
         idsInLoop.forEach(id => {
-          currentText = currentText.replace(new RegExp(`\\b${id}\\b`, "g"), `${id}_${loopIndx}_${loopIndx}`);
+            currentText = currentText.replace(new RegExp(`\\b${id}\\b`, "g"), `${id}_${loopIndx}_${loopIndx}`);
         })
-  
-        currentText = currentText.replace(/\{##\}/g, `${ordinal(loopIndx)}`)
-        // ids.map((id) => (currentText = currentText.replace(id.label, id.label.replace(id.id, id.id + "_" + loopIndx))));
-  
-        // disIfIDs = disIfIDs.filter((x) => newIds.includes(x));
-        // disIfIDs.map((id) => (currentText = currentText.replace(new RegExp(id + "\\b", "g"), id + "_" + loopIndx)));
-  
-        // // replace all -> Id with -> Id_#
-        // ids.map(
-        //   (id) => (currentText = currentText.replace(new RegExp("->\\s*" + id.id + "\\b", "g"), "-> " + id.id + "_" + loopIndx))
-        // );
-  
-        // // replace all |__(|__)|xxxx|  xxxx= id=questionid_xxx xor=questionid
-        // // |__|id=lalala_3_txt xor=lalala_3|  |xor= lalala id=lalala_txt|
-        // ids.map((id) => (currentText = currentText.replace(/(\|__(?:\|__)*\|[^|\s][^|]\b)(${id.id})(\b[^|]*\|)/g, `$1$2_${loopIndx}$3`)));
-  
+
+        currentText = currentText.replace(/\{##\}/g, `${ordinal(loopIndx)}`);
+
         ids.map(
-          (id) => (currentText = currentText.replace(/#loop/g, "" + loopIndx))
+            (id) => (currentText = currentText.replace(/#loop/g, "" + loopIndx))
         );
-  
-        // if (currentText.search(/->\s*_continue/g) >= 0) {
-        //   ;
-        //   if (loopIndx < x.cnt) {
-        //     currentText = currentText.replace(/->\s*_continue\s*/g, "-> " + ids[0].id + "_" + (loopIndx + 1));
-        //   } else {
-        //     currentText = currentText.replace(
-        //       /->\s*_continue\s*/g,
-        //       "-> " + document.getElementById(ids.slice(-1)[0].id + "_" + loopIndx).nextElementSibling.id
-        //     );
-        //   }
-        // }
-  
+
         // replace  _\d_\d#prev with _{$loopIndex-1}
         // we do it twice to match a previous bug..
         currentText = currentText.replace(/_\d+_\d+#prev/g, `_${loopIndx - 1}_${loopIndx - 1}`)
         loopText = loopText + "\n" + currentText;
-      }
-      loopText +=
+        }
+        loopText +=
         "[_CONTINUE" + x.indx + "_DONE" + ",displayif=setFalse(-1,#loop)]";
-      return loopText;
+        return loopText;
     });
-  
+
     for (var loopIndx = 0; loopIndx < cleanedText.length; loopIndx++) {
-      txt = txt.replace(res[loopIndx].orig, cleanedText[loopIndx]);
+        txt = txt.replace(res[loopIndx].orig, cleanedText[loopIndx]);
     }
     txt = txt.replace(/\xa9/g, "\n");
     return txt;
-  }
+}
   
 export function stopSubmit(event) {
     event.preventDefault();

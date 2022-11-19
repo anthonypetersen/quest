@@ -698,74 +698,65 @@ function setNumberOfQuestionsInModal(num, norp, retrieve, store, soft) {
   document.getElementById("modalContinueButton").onclick = f1;
   $("#softModal").modal("toggle");
 }
-// show modal function
+
 function showModal(norp, retrieve, store, rootElement) {
-  if (
-    norp.form.getAttribute("softedit") == "true" ||
-    norp.form.getAttribute("hardedit") == "true"
-  ) {
-    let numBlankReponses = [...norp.form.children]
-      .filter(
-        (x) =>
-          x.type &&
-          x.type != "hidden" &&
-          !x.hasAttribute("xor") &&
-          x.style.display != "none"
-      )
-      .reduce((t, x) => (x.value.length == 0 ? t + 1 : t), 0);
-    let hasNoResponses =
-      getSelected(norp.form).filter((x) => x.type !== "hidden").length == 0;
+	
+	if (norp.form.getAttribute("softedit") == "true" || norp.form.getAttribute("hardedit") == "true") {
+		
+		let numBlankReponses = [...norp.form.children]
+			.filter(
+			(x) =>
+				x.type &&
+				x.type != "hidden" &&
+				!x.hasAttribute("xor") &&
+				x.style.display != "none"
+			)
+			.reduce((t, x) => (x.value.length == 0 ? t + 1 : t), 0);
+		
+		let hasNoResponses =
+			getSelected(norp.form).filter((x) => x.type !== "hidden").length == 0;
 
-    if (norp.form.hasAttribute("radioCheckboxAndInput")) {
-      if (!radioCbHasAllAnswers(norp.form)) {
-        hasNoResponses = true;
-      }
-    }
+		if (norp.form.hasAttribute("radioCheckboxAndInput")) {
+			if (!radioCbHasAllAnswers(norp.form)) {
+			hasNoResponses = true;
+			}
+		}
 
-    if (norp.form.hasAttribute("grid")) {
-      if (!gridHasAllAnswers(norp.form)) {
-        hasNoResponses = true;
-      }
+		if (norp.form.hasAttribute("grid")) {
+			if (!gridHasAllAnswers(norp.form)) {
+			hasNoResponses = true;
+			}
 
-    }
-    // let tempVal = 0;
-    // if (hasNoResponses) {
-    //   tempVal = 0;
-    // } else {
-    //   tempVal = 1;
-    // }
-    if (numBlankReponses == 0 && hasNoResponses == true) {
-      numBlankReponses = 1;
-    } else if ((numBlankReponses == 0) == true && hasNoResponses == false) {
-      numBlankReponses = 0;
-    } else if ((numBlankReponses == 0) == false && hasNoResponses == true) {
-      numBlankReponses = numBlankReponses;
-    } else {
-      numBlankReponses = 0;
-    }
-    // numBlankReponses =
-    //   numBlankReponses == 0 && hasNoResponses ? tempVal : numBlankReponses;
+		}
+		// let tempVal = 0;
+		// if (hasNoResponses) {
+		//   tempVal = 0;
+		// } else {
+		//   tempVal = 1;
+		// }
+		if (numBlankReponses == 0 && hasNoResponses == true) {
+			numBlankReponses = 1;
+		} else if ((numBlankReponses == 0) == true && hasNoResponses == false) {
+			numBlankReponses = 0;
+		} else if ((numBlankReponses == 0) == false && hasNoResponses == true) {
+			numBlankReponses = numBlankReponses;
+		} else {
+			numBlankReponses = 0;
+		}
+		// numBlankReponses =
+		//   numBlankReponses == 0 && hasNoResponses ? tempVal : numBlankReponses;
 
-    if (numBlankReponses > 0) {
-      setNumberOfQuestionsInModal(
-        numBlankReponses,
-        norp,
-        retrieve,
-        store,
-        norp.form.getAttribute("softedit") == "true"
-      );
-      return null;
-    }
-    // if (
-    //   norp.getAttribute("data-target") == "#hardModal" &&
-    //   getSelected(norp.form) == 0
-    // ) {
-    //   $("#hardModal").modal("toggle");
-    //   return null;
-    // } else {
-    //   nextPage(norp, store);
-    // }
-  }
+		if (numBlankReponses > 0) {
+			setNumberOfQuestionsInModal(
+			numBlankReponses,
+			norp,
+			retrieve,
+			store,
+			norp.form.getAttribute("softedit") == "true"
+			);
+			return null;
+		}
+	}
   nextPage(norp, retrieve, store, rootElement);
 }
 
@@ -1004,20 +995,7 @@ export function displayQuestion(nextElement) {
       elm.classList.remove((f) ? "collapse" : "d-flex")
     });
 
-  // check min/max for variable substitution in validation
-  /*function exchangeValue(element, attrName, newAttrName) {
-    let attr = element.getAttribute(attrName);
-    if (attr) {
-      let isnum = /^[\d\.]+$/.test(attr);
-      if (!isnum) {
-        let tmpVal = evaluateCondition(attr);
-        console.log('------------exchanged Vals-----------------')
-        console.log(`${element} , ${attrName} , ${newAttrName} , ${tmpVal}`)
-        element.setAttribute(newAttrName, tmpVal);
-      }
-    }
-    return element;
-  }*/
+
   //Replacing all default HTML form validations with datasets
 
   [...nextElement.querySelectorAll("input[required]")].forEach((element) => {
@@ -1089,8 +1067,7 @@ export async function previousClicked(norp, retrieve, store, rootElement) {
   } else removeQuestion(moduleParams.questName, norp.form.id);
 
   updateTree();
-  // prevElement.parentElement.scrollIntoView();
-  //document.getElementById(rootElement).scrollIntoView();
+
   window.scrollTo(0, 0);
   return prevElement;
 }

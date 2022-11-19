@@ -1,4 +1,5 @@
 import { stopSubmit } from "./render.js";
+import { rbAndCbClick } from "./questionnaire.js";
 
 export class Survey {
     constructor() {
@@ -25,7 +26,7 @@ export class Survey {
     }
 
     add(question) {
-        this.survey.push(new Question(question, this.previousResults));
+        this.survey.push(new Question(question));
     }
 
     get() {
@@ -50,10 +51,57 @@ export class Survey {
         this.active = this.survey.indexOf(item);
         console.log(this.active);
 
-        let div = document.getElementById("question-holder");
-        div.innerHTML = item.display();
-        item.prepare(div.firstChild);
+        let div = document.getElementById("active-question");
+        div.innerHTML = item.render(item.id + item.suffix, item.options, item.args, item.text);
+        this.prepare(item, div.firstChild);
+
+
+
+
         return div.firstChild;
+    }
+
+    prepare(item, element) {
+        element.onsubmit = stopSubmit;
+        
+        element
+            .querySelectorAll("input[type='submit']")
+            .forEach((submitButton) => {
+                submitButton.addEventListener("click", (event) => {
+                event.target.form.clickType = event.target.value;
+            });
+        });
+
+        if(this.isFirst(item)) {
+            let buttonToRemove = element.querySelector(".previous");
+            if (buttonToRemove) {
+                buttonToRemove.remove();
+            }
+        }
+
+        if(this.isLast(item)) {
+            buttonToRemove = element.querySelector(".next");
+            if (buttonToRemove) {
+            buttonToRemove.remove();
+            }
+        }
+
+        let rbCb = [
+            ...element.querySelectorAll(
+            "input[type='radio'],input[type='checkbox'] "
+            ),
+        ];
+        rbCb.forEach((rcElement) => {
+            rcElement.onchange = rbAndCbClick;
+        });
+    }
+
+    isFirst(item) {
+        return this.survey[0] === item;
+    }
+
+    isLast(item) {
+        return this.survey[this.survey.length - 1] === item;
     }
 
     clear() {
@@ -63,7 +111,7 @@ export class Survey {
   
 
 class Question {
-    constructor(item, previousResults) {
+    constructor(item) {
         this.id =       item.id;
         this.options =  item.options;
         this.args =     item.args;
@@ -76,22 +124,4 @@ class Question {
             this.id = this.id.slice(0, -1);
         }
     };
-
-    display() {
-        return this.render(this.id + this.suffix, this.options, this.args, this.text, this.previousResults);
-    }
-
-    prepare(element) {
-        
-        element.onsubmit = stopSubmit;
-        
-        element
-            .querySelectorAll("input[type='submit']")
-            .forEach((submitButton) => {
-                submitButton.addEventListener("click", (event) => {
-                event.target.form.clickType = event.target.value;
-            });
-        });
-
-    }
 }
