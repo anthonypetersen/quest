@@ -6,7 +6,10 @@ Name |__|
 Address |__| 
 
 [B1] How old are you today?
-|__|__|
+(1) 0-9
+(2) 10-19
+(3) 20-29
+(4) 30-39
 
 [B2] What is the highest level of school that you have completed?
 (0) Grade school (grades 1-8)
