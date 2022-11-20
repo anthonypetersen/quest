@@ -9,24 +9,24 @@ Address |__|
 |__|__|
 
 [B2] What is the highest level of school that you have completed?
-() Grade school (grades 1-8)
-() Some high school (grades 9-11)
-() High school graduate or GED
-() Some college
-() Technical or trade school beyond high school
-() Associate’s degree
-() College graduate (Bachelor’s degree)
-() Advanced degree (Master’s, Doctorate, etc.)
-() Other ( specify ) [text box]
+(0) Grade school (grades 1-8)
+(1) Some high school (grades 9-11)
+(2) High school graduate or GED
+(3) Some college
+(4) Technical or trade school beyond high school
+(5) Associate’s degree
+(6) College graduate (Bachelor’s degree)
+(7) Advanced degree (Master’s, Doctorate, etc.)
+(99) Other ( specify ) [text box]
 
 [B3] What is your current marital/partner status?
-[] Never married
-[] Not married but living with partner
-[] Married
-[] Divorced
-[] Widowed
-[] Separated
-[] Prefer not to answer
+[0] Never married
+[1] Not married but living with partner
+[2] Married
+[3] Divorced
+[4] Widowed
+[5] Separated
+[99] Prefer not to answer
 
 [B4] What best describes your race? Select all that apply to you.
 [] American Indian or Alaska native
