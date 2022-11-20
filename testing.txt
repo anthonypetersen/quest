@@ -9,15 +9,15 @@ Address |__|
 |__|__|
 
 [B2] What is the highest level of school that you have completed?
-[] Grade school (grades 1-8)
-[] Some high school (grades 9-11)
-[] High school graduate or GED
-[] Some college
-[] Technical or trade school beyond high school
-[] Associate’s degree
-[] College graduate (Bachelor’s degree)
-[] Advanced degree (Master’s, Doctorate, etc.)
-[] Other ( specify ) [text box]
+() Grade school (grades 1-8)
+() Some high school (grades 9-11)
+() High school graduate or GED
+() Some college
+() Technical or trade school beyond high school
+() Associate’s degree
+() College graduate (Bachelor’s degree)
+() Advanced degree (Master’s, Doctorate, etc.)
+() Other ( specify ) [text box]
 
 [B3] What is your current marital/partner status?
 [] Never married
