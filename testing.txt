@@ -29,15 +29,15 @@ Address |__|
 [99] Prefer not to answer
 
 [B4] What best describes your race? Select all that apply to you.
-[] American Indian or Alaska native
-[] Asian
-[] Black or African American
-[] Middle Eastern or North African
-[] Native Hawaiian or other Pacific Islander
-[] White
-[] Other ( specify ) [text box]
-[] Do not know
-[] Prefer not to answer
+[1] American Indian or Alaska native
+[2] Asian
+[3] Black or African American
+[4] Middle Eastern or North African
+[5] Native Hawaiian or other Pacific Islander
+[6] White
+[7] Other ( specify ) [text box]
+[8] Do not know
+[99] Prefer not to answer
 [SEX] Later questions in this survey will ask about surgeries and medical procedures. We want to make sure that you are asked the right questions. 
 Please select the body parts that you were born with.
 [1] Penis
