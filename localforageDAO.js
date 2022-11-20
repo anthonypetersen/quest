@@ -1,4 +1,4 @@
-import { textboxinput, radioAndCheckboxUpdate } from "./questionnaire.js";
+import { textboxinput, radioAndCheckboxUpdate, survey } from "./questionnaire.js";
 
 export async function restoreResults(results) {
   // get the results from localforage...
@@ -27,17 +27,20 @@ export async function restoreResults(results) {
     console.log('-------checking qids------------')
     console.log(qid)
     let formElement = document.querySelector("#" + qid);
-    // not sure have a non-question would be here
-    // but ignore it...
-    if (!formElement) {
-      return;
-    }
+    
     // each question has an object of results...
     if (!results[qid]) return;
 
     // CASE 1:  it is just a simple value...
     if (typeof results[qid] == "string") {
-      // in this case get the first input/textarea in the form and fill it in.
+      let question = survey.find(qid);
+
+
+      //text input
+      survey.setAnswer(question, results[qid]);
+
+      //need to handle cb / rb
+      /*
       let element = formElement.querySelector("input,textarea,select");
       if (element.type == "radio") {
         let selector = `input[value='${results[qid]}']`;
@@ -48,16 +51,23 @@ export async function restoreResults(results) {
           console.log("...  problem with ", element);
         }
         radioAndCheckboxUpdate(selectedRadioElement);
-      } else {
+      } 
+      */
+     
+      // what is this about?
+      /*
+      else {
         if (element.type == "submit") {
           console.log(
             `local forage is trying to change the value of a submit button. Question ${qid} response value: ${results[qid]}; skipping this 1 value..`
           );
           return;
         }
-        element.value = results[qid];
-        textboxinput(element, false);
-      }
+        */
+        
+        //do we need this?
+        //textboxinput(element, false);
+
 
       // we should return from here...
       // then we should handle the ARRAY case.

@@ -665,7 +665,7 @@ export function handleXOR(inputElement) {
   return valueObj[inputElement.id];
 }
 
-export function nextClick(norp, retrieve, store, rootElement) {
+export function nextClick(norp, retrieve, store) {
   // Because next button does not have ID, modal will pass-in ID of question
   // norp needs to be next button element
   if (typeof norp == "string") {
@@ -677,7 +677,7 @@ export function nextClick(norp, retrieve, store, rootElement) {
     validateInput(elm)
   });
 
-  showModal(norp, retrieve, store, rootElement);
+  showModal(norp, retrieve, store);
 }
 
 function setNumberOfQuestionsInModal(num, norp, retrieve, store, soft) {
@@ -697,7 +697,7 @@ function setNumberOfQuestionsInModal(num, norp, retrieve, store, soft) {
   $("#softModal").modal("toggle");
 }
 
-function showModal(norp, retrieve, store, rootElement) {
+function showModal(norp, retrieve, store) {
 	
 	if (norp.form.getAttribute("softedit") == "true" || norp.form.getAttribute("hardedit") == "true") {
 		
@@ -755,7 +755,7 @@ function showModal(norp, retrieve, store, rootElement) {
 			return null;
 		}
 	}
-  nextPage(norp, retrieve, store, rootElement);
+  nextPage(norp, retrieve, store);
 }
 
 let tempObj = {};
@@ -799,7 +799,7 @@ function getNextQuestionId(currentFormElement) {
 }
 
 // norp == next or previous button (which ever is clicked...)
-async function nextPage(norp, retrieve, store, rootElement) {
+async function nextPage(norp, retrieve, store) {
   // The root is defined as null, so if the question is not the same as the
   // current value in the questionQueue. Add it.  Only the root should be effected.
   // NOTE: if the root has no children, add the current question to the queue
@@ -839,9 +839,14 @@ async function nextPage(norp, retrieve, store, rootElement) {
         }
         // set the value for the questionId...
         allResponses[questionElement.id] = questionElement.value;
+
         if (questionElement.value === undefined) {
           delete allResponses[questionElement.id]
         }
+		else {
+			let question = survey.find(questionElement.id);
+			survey.setAnswer(question, questionElement.value);
+		}
         return allResponses;
       })
       .then((allResponses) => {
@@ -1047,13 +1052,16 @@ export function displayQuestion(nextElement) {
   return nextElement;
 }
 
-export async function previousClicked(norp, retrieve, store, rootElement) {
-  // get the previousElement...
+export async function previousClicked(norp, retrieve, store) {
+  
+	survey.find(norp.form.id).clearAnswer();
+	
+	// get the previousElement...
   let pv = questionQueue.previous();
   while (pv.value.value.substring(0, 9) == "_CONTINUE") {
     pv = questionQueue.previous();
   }
-  let prevElement = survey.render(survey.find(pv.value.value), document.getElementById(rootElement));
+  let prevElement = survey.render(survey.find(pv.value.value));
   norp.form.classList.remove("active");
   displayQuestion(prevElement)
 

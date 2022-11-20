@@ -1,5 +1,3 @@
-import { moduleParams } from "./questionnaire.js";
-
 export const grid_replace_regex = /\|grid(\!|\?)*\|([^|]+)\|([^|]+)\|([^|]+)\|([^|]+)\|/g;
 
 export function firstFun(event) {

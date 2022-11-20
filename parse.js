@@ -1,13 +1,11 @@
-import { questionQueue, survey, nextClick, previousClicked, moduleParams, displayQuestion, submitQuestionnaire } from "./questionnaire.js";
+import { questionQueue, survey, moduleParams, displayQuestion, submitQuestionnaire } from "./questionnaire.js";
 import { restoreResults } from "./localforageDAO.js";
 import { parseGrid, grid_replace_regex } from "./buildGrid.js";
-import { clearValidationError } from "./validate.js";
 import { modals } from "./constants.js";
 
 export let transform = function () {};
   
 let questName = "Questionnaire";
-let rootElement;
   
 transform.parse = async (obj, divId, previousResults = {}) => {
     
@@ -15,7 +13,6 @@ transform.parse = async (obj, divId, previousResults = {}) => {
     moduleParams.previousResults = previousResults;
     moduleParams.soccer = obj.soccer;
 
-    rootElement = divId;
     let divElement = document.getElementById(divId);
 
     survey.clear();
@@ -695,7 +692,8 @@ transform.parse = async (obj, divId, previousResults = {}) => {
             options: questOpts,
             args: questArgs,
             text: questText,
-            render
+            render,
+            type: "text"
         });		
     });
 
@@ -889,44 +887,5 @@ function unrollLoops(txt) {
     txt = txt.replace(/\xa9/g, "\n");
     return txt;
 }
-  
-export function stopSubmit(event) {
-    event.preventDefault();
-  
-    if (event.target.clickType == "BACK") {
-        resetChildren(event.target.elements);
-        event.target.value = undefined;
-        let buttonClicked = event.target.getElementsByClassName("previous")[0];
-        previousClicked(buttonClicked, moduleParams.renderObj.retrieve, moduleParams.renderObj.store, rootElement);
-    } 
-    else if (event.target.clickType == "RESET ANSWER") {
-        resetChildren(event.target.elements);
-        event.target.value = undefined;
-    } 
-    else if (event.target.clickType == "Submit Survey") {
-  
-        $("#submitModal").modal("toggle");
-  
-    } 
-    else {
-        let buttonClicked = event.target.getElementsByClassName("next")[0];
-        nextClick(buttonClicked, moduleParams.renderObj.retrieve, moduleParams.renderObj.store, rootElement);
-    }
-}
-  
-function resetChildren(nodes) {
-    if (nodes == null) {
-        return;
-    }
-  
-    for (let node of nodes) {
-        if (node.type === "radio" || node.type === "checkbox") {
-            node.checked = false;
-        } 
-        else if (node.type === "text" || node.type === "time" || node.type === "date" || node.type === "month" || node.type === "number") {
-            node.value = "";
-            clearValidationError(node);
-        }
-    }
-}
+
   

@@ -1,6 +1,6 @@
-import { stopSubmit } from "./parse.js";
-import { rbAndCbClick, textBoxInput, handleXOR, parseSSN, parsePhoneNumber, } from "./questionnaire.js";
+import { rbAndCbClick, textBoxInput, handleXOR, parseSSN, parsePhoneNumber, moduleParams, nextClick, previousClicked } from "./questionnaire.js";
 import { toggle_grid } from "./buildGrid.js";
+import { clearValidationError } from "./validate.js";
 
 export class Survey {
     constructor() {
@@ -34,6 +34,10 @@ export class Survey {
         return this.survey;
     }
 
+    setAnswer(question, answer) {
+        question.setAnswer(answer);
+    }
+
     find(item) {
         let found = this.survey.filter(x => x.id === item);
         if(found) {
@@ -54,6 +58,13 @@ export class Survey {
 
         let div = document.getElementById("active-question");
         div.innerHTML = item.render(item.id + item.suffix, item.options, item.args, item.text);
+        
+        if(item.getAnswer()) {
+            if(item.type === "text") {
+                div.firstChild.querySelector("input,textarea,select").value = item.getAnswer();
+            }
+        }
+
         this.prepare(item, div.firstChild);
 
 
@@ -155,10 +166,67 @@ class Question {
         this.text =     item.text;
         this.render =   item.render;
         this.suffix =   "";
+        this.answer =   null;
+        this.type =     item.type;
 
         if(item.id.endsWith("?") || item.id.endsWith("!")) {
             this.suffix = this.id.slice(-1);
             this.id = this.id.slice(0, -1);
         }
     };
+
+    setAnswer(answer) {
+        this.answer = answer;
+    }
+
+    getAnswer() {
+        return this.answer;
+    }
+
+    clearAnswer() {
+        if(this.type === "text") {
+            this.answer = ""
+        }
+        //else
+    }
+}
+
+function stopSubmit(event) {
+    event.preventDefault();
+  
+    if (event.target.clickType == "BACK") {
+        resetChildren(event.target.elements);
+        event.target.value = undefined;
+        let buttonClicked = event.target.getElementsByClassName("previous")[0];
+        previousClicked(buttonClicked, moduleParams.renderObj.retrieve, moduleParams.renderObj.store);
+    } 
+    else if (event.target.clickType == "RESET ANSWER") {
+        resetChildren(event.target.elements);
+        event.target.value = undefined;
+    } 
+    else if (event.target.clickType == "Submit Survey") {
+  
+        $("#submitModal").modal("toggle");
+  
+    } 
+    else {
+        let buttonClicked = event.target.getElementsByClassName("next")[0];
+        nextClick(buttonClicked, moduleParams.renderObj.retrieve, moduleParams.renderObj.store);
+    }
+}
+
+function resetChildren(nodes) {
+    if (nodes == null) {
+        return;
+    }
+  
+    for (let node of nodes) {
+        if (node.type === "radio" || node.type === "checkbox") {
+            node.checked = false;
+        } 
+        else if (node.type === "text" || node.type === "time" || node.type === "date" || node.type === "month" || node.type === "number") {
+            node.value = "";
+            clearValidationError(node);
+        }
+    }
 }
