@@ -58,9 +58,18 @@ export class Survey {
 
         let div = document.getElementById("active-question");
         div.innerHTML = item.render(item.id + item.suffix, item.options, item.args, item.text);
+
+        let answer = item.getAnswer();
         
-        if(item.getAnswer()) {
-            if(item.type === "text") {
+        if(answer) {
+
+            console.log(typeof answer);
+
+            if(typeof answer === "string") {
+                div.firstChild.querySelector("input,textarea,select").value = answer;
+            }
+
+            if(typeof answer === "object") {
                 div.firstChild.querySelector("input,textarea,select").value = item.getAnswer();
             }
         }
