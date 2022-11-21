@@ -843,10 +843,7 @@ async function nextPage(norp, retrieve, store) {
         if (questionElement.value === undefined) {
           delete allResponses[questionElement.id]
         }
-		else {
-			let question = survey.find(questionElement.id);
-			survey.setAnswer(question, questionElement.value);
-		}
+  
         return allResponses;
       })
       .then((allResponses) => {
@@ -861,7 +858,8 @@ async function nextPage(norp, retrieve, store) {
       });
   }
   //}
-
+  let question = survey.find(questionElement.id);
+  survey.setAnswers(question);
 
   // check if we need to add questions to the question queue
   checkForSkips(questionElement);

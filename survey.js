@@ -34,8 +34,8 @@ export class Survey {
         return this.survey;
     }
 
-    setAnswer(question, answer) {
-        question.setAnswer(answer);
+    setAnswers(question) {
+        question.setAnswers();
     }
 
     find(item) {
@@ -54,26 +54,12 @@ export class Survey {
     render(item) {
 
         this.active = this.survey.indexOf(item);
-        console.log(this.active);
 
         let div = document.getElementById("active-question");
         div.innerHTML = item.render(item.id + item.suffix, item.options, item.args, item.text);
 
-        let answer = item.getAnswer();
+        item.getAnswers();
         
-        if(answer) {
-
-            console.log(typeof answer);
-
-            if(typeof answer === "string") {
-                div.firstChild.querySelector("input,textarea,select").value = answer;
-            }
-
-            if(typeof answer === "object") {
-                div.firstChild.querySelector("input,textarea,select").value = item.getAnswer();
-            }
-        }
-
         this.prepare(item, div.firstChild);
 
 
@@ -176,7 +162,6 @@ class Question {
         this.render =   item.render;
         this.suffix =   "";
         this.answer =   null;
-        this.type =     item.type;
 
         if(item.id.endsWith("?") || item.id.endsWith("!")) {
             this.suffix = this.id.slice(-1);
@@ -184,19 +169,46 @@ class Question {
         }
     };
 
-    setAnswer(answer) {
-        this.answer = answer;
+    setAnswers() {
+
+        let element = document.getElementById("active-question");
+        let inputs = element.querySelectorAll("input[type=radio], input[type=checkbox], input[type=text]");
+        
+        this.answer = {};
+        this.answer["values"] = [];
+
+        inputs.forEach(input => {
+            if(input.type === "radio" || input.type === "checkbox") {
+                this.answer["values"].push(input.checked);
+            }
+            else {
+                this.answer["values"].push(input.value);
+            }
+        })
+
+        
     }
 
-    getAnswer() {
-        return this.answer;
-    }
+    getAnswers() {
 
-    clearAnswer() {
-        if(this.type === "text") {
-            this.answer = ""
+        if(this.answer) {
+            let element = document.getElementById("active-question");
+            let inputs = element.querySelectorAll("input[type=radio], input[type=checkbox], input[type=text]");
+
+            inputs.forEach(input => {
+                if(input.type === "radio" || input.type === "checkbox") {
+                    input.checked = this.answer["values"].shift();
+                }
+                else {
+                    input.value = this.answer["values"].shift();
+                }
+            });
         }
-        //else
+    }
+
+    //do we need this?
+    clearAnswer() {
+        this.answer = null;
     }
 }
 
