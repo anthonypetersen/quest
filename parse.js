@@ -693,7 +693,6 @@ transform.parse = async (obj, divId, previousResults = {}) => {
             args: questArgs,
             text: questText,
             render,
-            type: "text"
         });		
     });
 
