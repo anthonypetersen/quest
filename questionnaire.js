@@ -1,7 +1,6 @@
 import { Tree } from "./tree.js";
 import { Survey } from "./survey.js";
 import { knownFunctions } from "./knownFunctions.js";
-import { removeQuestion } from "./localforageDAO.js";
 import { validateInput, validationError } from "./validate.js";
 
 export const moduleParams = {};
@@ -295,9 +294,7 @@ window.addEventListener("load", (event) => {
 // the question ids in the order they should be displayed.
 export const questionQueue = new Tree();
 export const survey = new Survey();
-export function isFirstQuestion() {
-  return questionQueue.isEmpty() || questionQueue.isFirst();
-}
+
 
 function numberOfInputs(element) {
   let resps = Array.from(
@@ -447,16 +444,9 @@ function exchangeValue(element, attrName, newAttrName) {
 }
 
 export function textboxinput(inputElement, validate = true) {
-  /////////// To change all max attributes to input element ///////////
-  // [...inputElement.parentElement.parentElement.children]
-  //   .filter((x) => x.hasAttribute("max"))
-  //   .map((x) =>
-  //     x.getAttribute("max").replace(x.getAttribute("max"), inputElement.value)
-  //   );
-  ///////////////////////////////////////////////////////////////////////
+
   let evalBool = "";
-  console.log('lsjdbvSDKVBSvlkdbv')
-  console.log(inputElement.value)
+
   if (inputElement.getAttribute("modalif") && inputElement.value != "") {
     evalBool = math.evaluate(
       decodeURIComponent(inputElement.getAttribute("modalif").replace(/value/, inputElement.value))
@@ -476,7 +466,6 @@ export function textboxinput(inputElement, validate = true) {
   }
 
   if (['text', 'number', 'email', 'tel', 'date', 'month', 'time'].includes(inputElement.type)) {
-    console.log(inputElement.type);
     if (validate) {
       validateInput(inputElement)
     }
@@ -501,11 +490,9 @@ export function textboxinput(inputElement, validate = true) {
   setFormValue(inputElement.form, value, id);
 }
 
-// onInput/Change handler for radio/checkboxex
 export function rbAndCbClick(event) {
   let inputElement = event.target;
-  // when we programatically click, the input element is null.
-  // however we call radioAndCheckboxUpdate directly..
+
   if (inputElement) {
     radioAndCheckboxUpdate(inputElement);
     radioAndCheckboxClearTextInput(inputElement);
@@ -665,7 +652,7 @@ export function handleXOR(inputElement) {
   return valueObj[inputElement.id];
 }
 
-export function nextClick(norp, retrieve, store) {
+export function nextClick(norp) {
   // Because next button does not have ID, modal will pass-in ID of question
   // norp needs to be next button element
   if (typeof norp == "string") {
@@ -677,10 +664,10 @@ export function nextClick(norp, retrieve, store) {
     validateInput(elm)
   });
 
-  showModal(norp, retrieve, store);
+  showModal(norp);
 }
 
-function setNumberOfQuestionsInModal(num, norp, retrieve, store, soft) {
+function setNumberOfQuestionsInModal(num, norp, soft) {
   let prompt = `There ${num > 1 ? "are" : "is"} ${num} question${num > 1 ? "s" : ""
     } unanswered on this page. `;
   if (!soft) {
@@ -689,7 +676,7 @@ function setNumberOfQuestionsInModal(num, norp, retrieve, store, soft) {
     return null;
   }
   let f1 = nextPage;
-  f1 = f1.bind(f1, norp, retrieve, store);
+  f1 = f1.bind(f1, norp);
   document.getElementById(
     "modalBodyText"
   ).innerText = `${prompt} Would you like to continue?`;
@@ -697,7 +684,7 @@ function setNumberOfQuestionsInModal(num, norp, retrieve, store, soft) {
   $("#softModal").modal("toggle");
 }
 
-function showModal(norp, retrieve, store) {
+function showModal(norp) {
 	
 	if (norp.form.getAttribute("softedit") == "true" || norp.form.getAttribute("hardedit") == "true") {
 		
@@ -726,12 +713,7 @@ function showModal(norp, retrieve, store) {
 			}
 
 		}
-		// let tempVal = 0;
-		// if (hasNoResponses) {
-		//   tempVal = 0;
-		// } else {
-		//   tempVal = 1;
-		// }
+
 		if (numBlankReponses == 0 && hasNoResponses == true) {
 			numBlankReponses = 1;
 		} else if ((numBlankReponses == 0) == true && hasNoResponses == false) {
@@ -741,42 +723,29 @@ function showModal(norp, retrieve, store) {
 		} else {
 			numBlankReponses = 0;
 		}
-		// numBlankReponses =
-		//   numBlankReponses == 0 && hasNoResponses ? tempVal : numBlankReponses;
 
 		if (numBlankReponses > 0) {
 			setNumberOfQuestionsInModal(
 			numBlankReponses,
 			norp,
-			retrieve,
-			store,
 			norp.form.getAttribute("softedit") == "true"
 			);
 			return null;
 		}
 	}
-  nextPage(norp, retrieve, store);
+  nextPage(norp);
 }
 
 let tempObj = {};
 
 async function updateTree() {
-  if (moduleParams?.renderObj?.updateTree) {
-    moduleParams.renderObj.updateTree(moduleParams.questName, questionQueue)
-  }
-  updateTreeInLocalForage()
-}
+  	if (moduleParams.updateTree) {
+		moduleParams.updateTree(moduleParams.questName, questionQueue);
+  	}
 
-async function updateTreeInLocalForage() {
-  // We dont have questName yet, don't bother saving the tree yet...
-  if (!('questName' in moduleParams)) {
-    return
-  }
-
-  let questName = moduleParams.questName;
-  // do you want a JSON string or a JS Object in LF???
-  // await localforage.setItem(questName + ".treeJSON", questionQueue.JSON());
-  await localforage.setItem(questName + ".treeJSON", questionQueue.toVanillaObject());
+	if (moduleParams.questName) {
+		await localforage.setItem(moduleParams.questName + ".treeJSON", questionQueue.toVanillaObject());
+	}
 }
 
 function getNextQuestionId(currentFormElement) {
@@ -799,7 +768,7 @@ function getNextQuestionId(currentFormElement) {
 }
 
 // norp == next or previous button (which ever is clicked...)
-async function nextPage(norp, retrieve, store) {
+async function nextPage(norp) {
   // The root is defined as null, so if the question is not the same as the
   // current value in the questionQueue. Add it.  Only the root should be effected.
   // NOTE: if the root has no children, add the current question to the queue
@@ -820,52 +789,16 @@ async function nextPage(norp, retrieve, store) {
   }
   let questName = moduleParams.questName;
   tempObj[questionElement.id] = questionElement.value;
-
-  //Check if questionElement exists first so its not pushing undefineds
-  //TODO if store is not defined, call lfstore -> redefine store to be store or lfstore
-  //if (questionElement.value) {
-  if (store) {
-    let formData = {};
-    formData[`${questName}.${questionElement.id}`] = questionElement.value;
-    console.log(formData)
-    await store(formData)
-  } else {
-    let tmp = await localforage
-      .getItem(questName)
-      .then((allResponses) => {
-        // if their is not an object in LF create one that we will add later...
-        if (!allResponses) {
-          allResponses = {};
-        }
-        // set the value for the questionId...
-        allResponses[questionElement.id] = questionElement.value;
-
-        if (questionElement.value === undefined) {
-          delete allResponses[questionElement.id]
-        }
   
-        return allResponses;
-      })
-      .then((allResponses) => {
-        // allResposes really should be defined at this point. If it wasn't
-        // previously in LF, the previous block should have created it...
-        localforage.setItem(questName, allResponses, () => {
-          console.log(
-            "... Response stored in LF: " + questName,
-            JSON.stringify(allResponses)
-          );
-        });
-      });
-  }
-  //}
   let question = survey.find(questionElement.id);
-  survey.setAnswers(question);
+  survey.saveAnswer(question);
+
+  await moduleParams.store(questName, question, "save");
 
   // check if we need to add questions to the question queue
   checkForSkips(questionElement);
 
   let nextQuestionId = getNextQuestionId(questionElement);
-  // get the actual HTML element.
   let nextElement = survey.render(survey.find(nextQuestionId.value));
 
   nextElement = exitLoop(nextElement);
@@ -894,9 +827,7 @@ async function nextPage(norp, retrieve, store) {
       console.trace();
     }
   }
-  //hide the current question
-  questionElement.classList.remove("active");
-  // nextElement.scrollIntoView();
+
 
   displayQuestion(nextElement);
   // nextElement.scrollIntoView();
@@ -904,22 +835,12 @@ async function nextPage(norp, retrieve, store) {
   window.scrollTo(0, 0);
 }
 
-export async function submitQuestionnaire(store, questName) {
-  console.log("submit questionnaire clicked!");
-  if (store) {
-    let formData = {};
-    formData[`${questName}.COMPLETED`] = true;
-    formData[`${questName}.COMPLETED_TS`] = new Date();
-    try {
-      store(formData).then(() => {
-        location.reload();
-      });
-    } catch (e) {
-      console.log("Store failed", e);
-    }
-
-  }
+export async function submitQuestionnaire(questName) {
+  
+  	moduleParams.store(questName, null, "complete");
+	location.reload();
 }
+
 function exitLoop(nextElement) {
   if (nextElement.hasAttribute("firstquestion")) {
     let loopMax = parseInt(document.getElementById(nextElement.getAttribute("loopmax"))
@@ -1039,9 +960,6 @@ export function displayQuestion(nextElement) {
     element.innerHTML=math.existingValues(element.dataset.displaylistArgs)
   })
 
-  //move to the next question...
-  nextElement.classList.add("active");
-
   // FINALLY...  update the tree in localForage...
   // First let's try NOT waiting for the function to return.
   updateTree();
@@ -1050,30 +968,28 @@ export function displayQuestion(nextElement) {
   return nextElement;
 }
 
-export async function previousClicked(norp, retrieve, store) {
+export async function previousClicked(norp) {
   
-	survey.find(norp.form.id).clearAnswer();
+	let question = survey.find(norp.form.id);
+
+	question.clearAnswer();
+	await moduleParams.store(moduleParams.questName, question, "remove");
 	
 	// get the previousElement...
-  let pv = questionQueue.previous();
-  while (pv.value.value.substring(0, 9) == "_CONTINUE") {
-    pv = questionQueue.previous();
-  }
-  let prevElement = survey.render(survey.find(pv.value.value));
-  norp.form.classList.remove("active");
-  displayQuestion(prevElement)
+	let pv = questionQueue.previous();
+	while (pv.value.value.substring(0, 9) == "_CONTINUE") {
+		pv = questionQueue.previous();
+	}
+	let prevElement = survey.render(survey.find(pv.value.value));
+	
+	displayQuestion(prevElement);
 
-  if (store) {
-    console.log("setting... ", moduleParams.questName, "=== UNDEFINED")
-    let formData = {};
-    formData[`${moduleParams.questName}.${norp.form.id}`] = undefined;
-    store(formData);
-  } else removeQuestion(moduleParams.questName, norp.form.id);
+	//duplicate updateTree() ?
+  	updateTree();
 
-  updateTree();
+  	window.scrollTo(0, 0);
 
-  window.scrollTo(0, 0);
-  return prevElement;
+  	return prevElement;
 }
 
 // this function just adds questions to the

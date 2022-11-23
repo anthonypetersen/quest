@@ -34,8 +34,8 @@ export class Survey {
         return this.survey;
     }
 
-    setAnswers(question) {
-        question.setAnswers();
+    saveAnswer(question) {
+        question.saveAnswer();
     }
 
     find(item) {
@@ -58,12 +58,9 @@ export class Survey {
         let div = document.getElementById("active-question");
         div.innerHTML = item.render(item.id + item.suffix, item.options, item.args, item.text);
 
-        item.getAnswers();
+        item.getAnswer();
         
         this.prepare(item, div.firstChild);
-
-
-
 
         return div.firstChild;
     }
@@ -161,7 +158,7 @@ class Question {
         this.text =     item.text;
         this.render =   item.render;
         this.suffix =   "";
-        this.answer =   null;
+        this.answer =   [];
 
         if(item.id.endsWith("?") || item.id.endsWith("!")) {
             this.suffix = this.id.slice(-1);
@@ -169,46 +166,53 @@ class Question {
         }
     };
 
-    setAnswers() {
+    restoreAnswer(answer) {
+        this.answer = answer;
+    }
+
+    saveAnswer() {
 
         let element = document.getElementById("active-question");
         let inputs = element.querySelectorAll("input[type=radio], input[type=checkbox], input[type=text]");
-        
-        this.answer = {};
-        this.answer["values"] = [];
 
         inputs.forEach(input => {
+
+            let elementInfo = {};
+
+            elementInfo["id"] = input.id;
+            elementInfo["type"] = input.type;
+
             if(input.type === "radio" || input.type === "checkbox") {
-                this.answer["values"].push(input.checked);
+                elementInfo["value"] = input.checked;
             }
             else {
-                this.answer["values"].push(input.value);
+                elementInfo["value"] = input.value;
             }
-        })
 
-        
+            this.answer.push(elementInfo);
+        });
     }
 
-    getAnswers() {
+    getAnswer() {
 
-        if(this.answer) {
+        if(this.answer.length > 0) {
+
             let element = document.getElementById("active-question");
             let inputs = element.querySelectorAll("input[type=radio], input[type=checkbox], input[type=text]");
 
             inputs.forEach(input => {
                 if(input.type === "radio" || input.type === "checkbox") {
-                    input.checked = this.answer["values"].shift();
+                    input.checked = this.answer.shift()["value"];
                 }
                 else {
-                    input.value = this.answer["values"].shift();
+                    input.value = this.answer.shift()["value"];
                 }
             });
         }
     }
 
-    //do we need this?
     clearAnswer() {
-        this.answer = null;
+        this.answer = [];
     }
 }
 
@@ -219,7 +223,7 @@ function stopSubmit(event) {
         resetChildren(event.target.elements);
         event.target.value = undefined;
         let buttonClicked = event.target.getElementsByClassName("previous")[0];
-        previousClicked(buttonClicked, moduleParams.renderObj.retrieve, moduleParams.renderObj.store);
+        previousClicked(buttonClicked);
     } 
     else if (event.target.clickType == "RESET ANSWER") {
         resetChildren(event.target.elements);
@@ -232,7 +236,7 @@ function stopSubmit(event) {
     } 
     else {
         let buttonClicked = event.target.getElementsByClassName("next")[0];
-        nextClick(buttonClicked, moduleParams.renderObj.retrieve, moduleParams.renderObj.store);
+        nextClick(buttonClicked);
     }
 }
 

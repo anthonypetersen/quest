@@ -1,5 +1,5 @@
 import { questionQueue, survey, moduleParams, displayQuestion, submitQuestionnaire } from "./questionnaire.js";
-import { restoreResults } from "./localforageDAO.js";
+import { restore, store } from "./storage.js";
 import { parseGrid, grid_replace_regex } from "./buildGrid.js";
 import { modals } from "./constants.js";
 
@@ -9,13 +9,24 @@ let questName = "Questionnaire";
   
 transform.parse = async (obj, divId, previousResults = {}) => {
     
-    moduleParams.renderObj = obj;
+    survey.clear();
+
+    if(obj.store) {
+        moduleParams.store = obj.store
+    }
+    else {
+        moduleParams.store = store;
+    }
+
+    if(obj.updateTree) {
+        moduleParams.updateTree = obj.updateTree;
+    }
+
     moduleParams.previousResults = previousResults;
     moduleParams.soccer = obj.soccer;
 
     let divElement = document.getElementById(divId);
 
-    survey.clear();
 
     let contents = "";
 
@@ -708,59 +719,33 @@ transform.parse = async (obj, divId, previousResults = {}) => {
 
 
     document.getElementById(divId).innerHTML = modals();
-    
-    async function fillForm(retrieve) {
-        let questObj = {};
 
-        if (retrieve) {
-            const response = await retrieve();
-            if (response.code === 200) {
-                const userData = response.data;
-                console.log("retrieve module name===", moduleParams.questName);
 
-                if (userData[moduleParams.questName]) {
-                    questObj = userData[moduleParams.questName];
-                    console.log("questObj===", questObj);
-                    await restoreResults(questObj);
-                }
+
+    let results = null;
+
+    if(obj.retrieve) {
+
+        const response = await retrieve();
+        if (response.code === 200) {
+            const userData = response.data;
+
+            if (userData[questName]) {
+                results = userData[moduleParams.questName];
+                await restoreResults(questObj);
             }
-        } 
-        else {
-
-            let results = await localforage.getItem(questName);
-
-            if (results == null) results = {};
-            await restoreResults(results);
         }
     }
-
-    function resetTree() {
-        if (survey.get().length > 0) {
-    
-            let question;
-            let qid = questionQueue.currentNode.value;
-    
-            if (qid) {
-                question = survey.find(qid);
-            }
-            else {
-                questionQueue.add(survey.get()[0].id);
-                questionQueue.next();
-    
-                question = survey.first();
-            }
-    
-            console.log(` ==============>>>>  setting ${question.id} active`);
-    
-            let rendered = survey.render(question, divElement);
-            displayQuestion(rendered);
-        }
+    else {
+        results = await localforage.getItem(questName);
     }
 
-    await fillForm(obj.retrieve);
+    if(results) await restore(results);
+
+
 
     if (obj.treeJSON) {
-        questionQueue.loadFromJSON(obj.treeJSON)
+        questionQueue.loadFromJSON(obj.treeJSON);
     } 
     else {
         await localforage.getItem(questName + ".treeJSON").then((tree) => {
@@ -773,19 +758,41 @@ transform.parse = async (obj, divId, previousResults = {}) => {
         });
     }
 
-    resetTree();
+
+
+    if (survey.get().length > 0) {
+    
+        let question;
+        let qid = questionQueue.currentNode.value;
+
+        if (qid) {
+            question = survey.find(qid);
+        }
+        else {
+            questionQueue.add(survey.get()[0].id);
+            questionQueue.next();
+
+            question = survey.first();
+        }
+
+        let rendered = survey.render(question, divElement);
+        displayQuestion(rendered);
+    }
+
 
 
     document.getElementById("submitModalButton").onclick = () => {
         let lastBackButton = document.getElementById('lastBackButton');
         if (lastBackButton) {
-        lastBackButton.remove();
+            lastBackButton.remove();
         }
+        
         let submitButton = document.getElementById('submitButton');
         if (submitButton) {
-        submitButton.remove();
+            submitButton.remove();
         }
-        submitQuestionnaire(moduleParams.renderObj.store, questName);
+
+        submitQuestionnaire(moduleParams.questName);
     };
 
 
