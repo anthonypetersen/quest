@@ -294,9 +294,7 @@ window.addEventListener("load", (event) => {
 // the question ids in the order they should be displayed.
 export const questionQueue = new Tree();
 export const survey = new Survey();
-export function isFirstQuestion() {
-  return questionQueue.isEmpty() || questionQueue.isFirst();
-}
+
 
 function numberOfInputs(element) {
   let resps = Array.from(
