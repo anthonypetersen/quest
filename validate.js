@@ -72,7 +72,7 @@ export function validationError(inputElement, errorMsg) {
 }
 
 function validate_number(inputElement) {
-    console.log("in validate number")
+
     callExchangeValues(inputElement)
     let belowMin =
         inputElement.dataset.min &&
@@ -96,7 +96,6 @@ function validate_number(inputElement) {
 }
 
 function valiate_month(inputElement) {
-    console.log("in validate_month", inputElement)
 
     // because type="month" is not supported on firefox be careful with the input...
     let value = inputElement.value.trim();
@@ -136,7 +135,6 @@ function valiate_month(inputElement) {
 }
 
 function validate_date(inputElement) {
-    console.log("in validate_date", inputElement)
 
     let minDate = (inputElement.dataset.minDate) ? new Date(inputElement.dataset.minDate + "GMT") : undefined
     let maxDate = (inputElement.dataset.maxDate) ? new Date(inputElement.dataset.maxDate + "GMT") : undefined
@@ -162,7 +160,6 @@ function validate_date(inputElement) {
 }
 
 function validate_email(inputElement) {
-    console.log("in validate email", inputElement)
 
     let emailRegEx = /\S+@\S+\.\S+/;
     if (!emailRegEx.test(inputElement.value)) {
@@ -173,7 +170,6 @@ function validate_email(inputElement) {
 }
 
 function validate_telephone(inputElement) {
-    console.log("in validate telephone", inputElement)
 
     if (inputElement.value.length < 12) {
         validationError(inputElement, "Please enter a phone number in this format: 999-999-9999.")
@@ -183,7 +179,6 @@ function validate_telephone(inputElement) {
 }
 
 function validate_text(inputElement) {
-    console.log("in validate text")
 
     // validate a SSN...
     if (inputElement.classList.contains("SSN")) {

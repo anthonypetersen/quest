@@ -13,11 +13,6 @@ async function quest() {
                 "rendering",
                 previousResults
             ); 
-
-            if (document.querySelector(".question") != null) {
-                document.querySelector(".question").classList.add("active");
-            }
-            
         });
     }
 }
