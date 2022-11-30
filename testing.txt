@@ -11,6 +11,14 @@ Address |__|
 (3) 20-29
 (4) 30-39
 
+[NUMKIDS] Number of Children |__|__|id=numchildren|
+
+<loop max=20>
+[KIDNAME|firstquestion=#loop loopmax=numchildren|] What your {##} child's  name? |__|id=kidsname|
+[KIDAGE]  What is  child # #loop's ({$KIDNAME}'s) age? |__|__|id=kidsage|
+< -> _CONTINUE >
+</loop>
+
 [B2] What is the highest level of school that you have completed?
 (0) Grade school (grades 1-8)
 (1) Some high school (grades 9-11)
@@ -21,6 +29,10 @@ Address |__|
 (6) College graduate (Bachelor’s degree)
 (7) Advanced degree (Master’s, Doctorate, etc.)
 (99) Other ( specify ) [text box]
+
+|grid|id="grid_test"|During the past year, how many times do you the following activities
+|[ [TX1] Tie your shoes; [TX2] Chew Gum; [TX3] Hop on one foot;]
+|[1:Never] [2:less than Once per week] [3:less than once per day] [4: more than once per day]|
 
 [B3] What is your current marital/partner status?
 [0] Never married
@@ -41,22 +53,4 @@ Address |__|
 [7] Other ( specify ) [text box]
 [8] Do not know
 [99] Prefer not to answer
-[SEX] Later questions in this survey will ask about surgeries and medical procedures. We want to make sure that you are asked the right questions. 
-Please select the body parts that you were born with.
-[1] Penis
-[2] Testes
-[3] Prostate
-[4] Vagina
-[5] Cervix
-[6] Uterus
-[7] Ovaries
-[8] Fallopian Tubes
 
-|grid|id="grid_SECSM"|People in Household|[ [SECSMA,displayif=equals(SEX,1)] Birth to 5 years of age; [SECSMB] Ages 6 to 10; [SECSMC] Ages 11 to 14; [SECSMD] Ages 15 to 17;]|(1:Every day, at least 2 hours each day
-) (2:Every day, less than 2 hours each day
-) (3:Most days of the week) (4:A few days per week) (5:One day per week) (6: A few days per month) (7: One day per month) (8:  few days per year) (9: Never)|
-
-[HRMED2?] What medication did you use to treat thinning hair or hair loss? Select all that apply.
-[1] Rogaine, Minoxidil, or Ioniten
-[2,displayif=equals(SEX,1)]Finasteride
-[3] Other: Please describe [text box]
