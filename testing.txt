@@ -16,7 +16,6 @@ Address |__|
 <loop max=20>
 [KIDNAME|firstquestion=#loop loopmax=numchildren|] What your {##} child's  name? |__|id=kidsname|
 [KIDAGE]  What is  child # #loop's ({$KIDNAME}'s) age? |__|__|id=kidsage|
-< -> _CONTINUE >
 </loop>
 
 [B2] What is the highest level of school that you have completed?
