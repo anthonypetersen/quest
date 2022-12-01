@@ -9,8 +9,35 @@ export async function parseMarkdown(text) {
     
     await initialize();
 
-    let questionRegex = /(\[[A-Z_]|\|grid\||<(?:\/)?loop)/g;
-    let questions = text.split(questionRegex);
+    let postLoop = [];
+    let postGrid = [];
+    let postQuestion = [];
+
+    text = text.replace(/[\r\n]/gm, '')
+
+    postLoop = text.split(regex.loop);
+
+    postLoop.forEach(index => {
+        let temp = index.split(regex.grid);
+
+        temp.forEach(tempIndex => {
+            postGrid.push(tempIndex);
+        });
+    });
+
+    postGrid.forEach(index => {
+        if(index.startsWith("<loop") || index.startsWith("|grid")) {
+            postQuestion.push(index);
+        }
+        else {
+            let temp = index.split(regex.question);
+
+            temp.forEach(tempIndex => {
+                if(tempIndex) postQuestion.push(tempIndex);
+            });
+        }
+    });
+
     console.log();
 
 }
