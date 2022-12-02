@@ -147,18 +147,18 @@ export class Questionnaire {
   
 
 class Question {
-    constructor(item) {
-        this.id =       item.id;
-        this.options =  item.options;
-        this.args =     item.args;
-        this.text =     item.text;
-        this.render =   item.render;
-        this.suffix =   "";
-        this.answer =   [];
+    constructor(markdown) {
+        this.markdown = markdown;
+        this.type;
 
-        if(item.id.endsWith("?") || item.id.endsWith("!")) {
-            this.suffix = this.id.slice(-1);
-            this.id = this.id.slice(0, -1);
+        if(markdown.startsWith("<loop")) {
+            this.type = "loop";
+        }
+        else if(markdown.startsWith("|grid")) {
+            this.type = "grid";
+        }
+        else {
+            this.type = "simple";
         }
     };
 

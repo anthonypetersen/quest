@@ -1,4 +1,4 @@
-import { moduleParams } from "./quest.js";
+import { moduleParams, questions } from "./quest.js";
 import { initialize } from "./storage.js";
 import regex from "./regex.js";
 
@@ -9,6 +9,23 @@ export async function parseMarkdown(text) {
     
     await initialize();
 
+    let markdownSplit = splitQuestions(text);
+
+    markdownSplit.forEach(question => {
+        questions.add(question);
+    });
+}
+
+function extractModuleName(text) {
+
+    let match = text.match(regex.moduleName);
+    moduleParams.name = match ? match[1] : "Module";
+
+    console.log("Setting module name: " + moduleParams.name);
+}
+
+function splitQuestions(text) {
+    
     let postLoop = [];
     let postGrid = [];
     let postQuestion = [];
@@ -38,14 +55,5 @@ export async function parseMarkdown(text) {
         }
     });
 
-    console.log();
-
-}
-
-function extractModuleName(text) {
-
-    let match = text.match(regex.moduleName);
-    moduleParams.name = match ? match[1] : "Module";
-
-    console.log("Setting module name: " + moduleParams.name);
+    return postQuestion;
 }
