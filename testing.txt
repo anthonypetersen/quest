@@ -11,12 +11,6 @@ Address |__|
 (3) 20-29
 (4) 30-39
 
-[NUMKIDS] Number of Children |__|__|id=numchildren|
-
-<loop max=20>
-[KIDNAME|firstquestion=#loop loopmax=numchildren|] What your {##} child's  name? |__|id=kidsname|
-[KIDAGE]  What is  child # #loop's ({$KIDNAME}'s) age? |__|__|id=kidsage|
-</loop>
 
 [B2] What is the highest level of school that you have completed?
 (0) Grade school (grades 1-8)
@@ -29,9 +23,6 @@ Address |__|
 (7) Advanced degree (Master’s, Doctorate, etc.)
 (99) Other ( specify ) [text box]
 
-|grid|id="grid_test"|During the past year, how many times do you the following activities
-|[ [TX1] Tie your shoes; [TX2] Chew Gum; [TX3] Hop on one foot;]
-|[1:Never] [2:less than Once per week] [3:less than once per day] [4: more than once per day]|
 
 [B3] What is your current marital/partner status?
 [0] Never married
