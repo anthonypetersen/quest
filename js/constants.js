@@ -2,6 +2,8 @@ export const modals = () => {
     return `
         <div id="active-question"></div>
 
+        <div id="buttons"</div> 
+
         <div class="modal" id="softModal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">

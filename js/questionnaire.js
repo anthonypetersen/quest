@@ -1,253 +1,40 @@
 export class Questionnaire {
     constructor() {
-        this.survey = [];  
-        this.active = null;
+        this.stack = [];
     };
 
-    first() {
-        if(this.survey[0]) {
-            return this.survey[0];
-        }
+    add(params) {
+        this.stack.push(new Question(params));
     }
 
-    next() {
-        if(this.survey[this.active + 1]) {
-            return this.survey[this.active + 1];
-        }
-    }
-
-    previous() {
-        if(this.survey[this.active - 1]) {
-            return this.survey[this.active - 1];
-        }
-    }
-
-    add(question) {
-        this.survey.push(new Question(question));
-    }
-
-    get() {
-        return this.survey;
-    }
-
-    saveAnswer(question) {
-        question.saveAnswer();
-    }
-
-    find(item) {
-        let found = this.survey.filter(x => x.id === item);
+    find(id) {
+        let found = this.stack.filter(q => q.params.id === id);
         if(found) {
             return found[0];
         }
-        else{
-            found = this.survey.filter(x => x.id === item + "!")
-            if(found) {
-                return found[0];
-            }
-        }
     }
 
-    render(item) {
-
-        this.active = this.survey.indexOf(item);
-
-        let div = document.getElementById("active-question");
-        div.innerHTML = item.render(item.id + item.suffix, item.options, item.args, item.text);
-
-        item.getAnswer();
-        
-        this.prepare(item, div.firstChild);
-
-        return div.firstChild;
+    first() {
+        return this.stack[0];
     }
 
-    prepare(item, element) {
-        element.onsubmit = stopSubmit;
-        
-        element
-            .querySelectorAll("input[type='submit']")
-            .forEach((submitButton) => {
-                submitButton.addEventListener("click", (event) => {
-                event.target.form.clickType = event.target.value;
-            });
-        });
-
-        if(this.isFirst(item)) {
-            let buttonToRemove = element.querySelector(".previous");
-            if (buttonToRemove) {
-                buttonToRemove.remove();
-            }
-        }
-
-        if(this.isLast(item)) {
-            let buttonToRemove = element.querySelector(".next");
-            if (buttonToRemove) {
-            buttonToRemove.remove();
-            }
-        }
-
-        element.querySelectorAll("input[type='text'],input[type='number'],input[type='email'],input[type='tel'],input[type='date'],input[type='month'],input[type='time'],textarea,select")
-            .forEach((inputElement) => {
-                inputElement.onblur = textBoxInput;
-                inputElement.setAttribute("style", "size: 20 !important");
-        });
-
-        element.querySelectorAll("input[type='radio'],input[type='checkbox'] ")
-            .forEach((rcElement) => {
-                rcElement.onchange = rbAndCbClick;
-        });
-
-        element.querySelectorAll("input").forEach((inputElement) => {
-            inputElement.addEventListener("keydown", (event) => {
-                if (event.keyCode == 13) {
-                    event.preventDefault();
-                }
-            });
-        });
-
-        //document?
-        Array.from(document.querySelectorAll("[xor]")).forEach(xorElement => {
-            xorElement.addEventListener("keydown", () => handleXOR(xorElement));
-        })
-
-        element.querySelectorAll(".SSN").forEach((inputElement) => {
-            inputElement.addEventListener("keyup", parseSSN);
-
-        });
-
-        element.querySelectorAll("input[type='tel']").forEach((inputElement) => {
-            inputElement.addEventListener("keyup", parsePhoneNumber)
-        });
-
-        element.querySelectorAll(".grid-input-element").forEach((x) => {
-            x.addEventListener("change", toggle_grid);
-        });
-
-        element.querySelectorAll("[data-hidden]").forEach((x) => {
-            x.style.display = "none";
-        });
-
-        $(".popover-dismiss").popover({
-            trigger: "focus",
-        });
+    get() {
+        return this.stack;
     }
 
-    isFirst(item) {
-        return this.survey[0] === item;
+    getNext(previousQuestion) {
+        let index = this.stack.indexOf(previousQuestion);
+        return this.stack[index + 1];
     }
 
-    isLast(item) {
-        return this.survey[this.survey.length - 1] === item;
-    }
-
-    clear() {
-        this.survey = [];
+    last() {
+        return this.stack[this.stack.length - 1];
     }
 }
   
 
 class Question {
-    constructor(markdown) {
-        this.markdown = markdown;
-        this.type;
-
-        if(markdown.startsWith("<loop")) {
-            this.type = "loop";
-        }
-        else if(markdown.startsWith("|grid")) {
-            this.type = "grid";
-        }
-        else {
-            this.type = "simple";
-        }
+    constructor(params) {
+        this.params = params;
     };
-
-    restoreAnswer(answer) {
-        this.answer = answer;
-    }
-
-    saveAnswer() {
-
-        let element = document.getElementById("active-question");
-        let inputs = element.querySelectorAll("input[type=radio], input[type=checkbox], input[type=text]");
-
-        inputs.forEach(input => {
-
-            let elementInfo = {};
-
-            elementInfo["id"] = input.id;
-            elementInfo["type"] = input.type;
-
-            if(input.type === "radio" || input.type === "checkbox") {
-                elementInfo["value"] = input.checked;
-            }
-            else {
-                elementInfo["value"] = input.value;
-            }
-
-            this.answer.push(elementInfo);
-        });
-    }
-
-    getAnswer() {
-
-        if(this.answer.length > 0) {
-
-            let element = document.getElementById("active-question");
-            let inputs = element.querySelectorAll("input[type=radio], input[type=checkbox], input[type=text]");
-
-            inputs.forEach(input => {
-                if(input.type === "radio" || input.type === "checkbox") {
-                    input.checked = this.answer.shift()["value"];
-                }
-                else {
-                    input.value = this.answer.shift()["value"];
-                }
-            });
-        }
-    }
-
-    clearAnswer() {
-        this.answer = [];
-    }
-}
-
-function stopSubmit(event) {
-    event.preventDefault();
-  
-    if (event.target.clickType == "BACK") {
-        resetChildren(event.target.elements);
-        event.target.value = undefined;
-        let buttonClicked = event.target.getElementsByClassName("previous")[0];
-        previousClicked(buttonClicked);
-    } 
-    else if (event.target.clickType == "RESET ANSWER") {
-        resetChildren(event.target.elements);
-        event.target.value = undefined;
-    } 
-    else if (event.target.clickType == "Submit Survey") {
-  
-        $("#submitModal").modal("toggle");
-  
-    } 
-    else {
-        let buttonClicked = event.target.getElementsByClassName("next")[0];
-        nextClick(buttonClicked);
-    }
-}
-
-function resetChildren(nodes) {
-    if (nodes == null) {
-        return;
-    }
-  
-    for (let node of nodes) {
-        if (node.type === "radio" || node.type === "checkbox") {
-            node.checked = false;
-        } 
-        else if (node.type === "text" || node.type === "time" || node.type === "date" || node.type === "month" || node.type === "number") {
-            node.value = "";
-            clearValidationError(node);
-        }
-    }
 }

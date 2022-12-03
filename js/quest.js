@@ -14,9 +14,12 @@ export async function generate(text, div, params) {
 
     console.log("Starting Quest...");
 
+    moduleParams.element = div;
     moduleParams.store = params.store ? params.store : store;
     moduleParams.updateTree = params.updateTree ? params.updateTree : updateTree;
     moduleParams.previousResults = params.previousResults ? params.previousResults : {};
+
+    document.getElementById(div).innerHTML = modals();
 
     await parseMarkdown(text);
 
@@ -46,9 +49,6 @@ export async function generate(text, div, params) {
             }
         });
     }
-
-
-    document.getElementById(div).innerHTML = modals();
 
     startModule();
 }

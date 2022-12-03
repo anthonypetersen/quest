@@ -9,10 +9,27 @@ export async function parseMarkdown(text) {
     
     await initialize();
 
+    text = prepareMarkdown(text);
+
     let markdownSplit = splitQuestions(text);
 
     markdownSplit.forEach(question => {
-        questions.add(question);
+        let results;
+        
+        //questions.add(question);
+
+        //want to check if question, loop, or grid
+
+        //if grid
+        //else if loop
+        //else
+        results = validateQuestion(question);
+        if(results) {
+            questions.add(results);
+        }
+        else {
+            // throw error
+        }
     });
 }
 
@@ -30,12 +47,10 @@ function splitQuestions(text) {
     let postGrid = [];
     let postQuestion = [];
 
-    text = text.replace(/[\r\n]/gm, '')
-
-    postLoop = text.split(regex.loop);
+    postLoop = text.split(regex.loopGeneric);
 
     postLoop.forEach(index => {
-        let temp = index.split(regex.grid);
+        let temp = index.split(regex.gridGeneric);
 
         temp.forEach(tempIndex => {
             postGrid.push(tempIndex);
@@ -47,7 +62,7 @@ function splitQuestions(text) {
             postQuestion.push(index);
         }
         else {
-            let temp = index.split(regex.question);
+            let temp = index.split(regex.questionGeneric);
 
             temp.forEach(tempIndex => {
                 if(tempIndex) postQuestion.push(tempIndex);
@@ -56,4 +71,41 @@ function splitQuestions(text) {
     });
 
     return postQuestion;
+}
+
+function prepareMarkdown(text) {
+    text = text.replace(/[\r\n]/gm, '');
+
+    return text;
+}
+
+function validateQuestion(text) {
+
+    let match = text.match(regex.questionSpecific);
+
+    if(match) {
+        let params = {};
+
+        params.id = match[1];
+
+        if(match[2]) {
+            params.edit = match[2] == "!" ? "hard" : "soft";
+        }
+
+        params.args = match[3];
+        params.text = match[4];
+        params.type = "question";
+
+        return params;
+    }
+
+    return false;
+}
+
+function validateLoop(text) {
+    
+}
+
+function validateGrid(text) {
+
 }
