@@ -12,8 +12,6 @@ export const moduleParams = {};
 
 export async function generate(text, div, params) {
 
-    console.log("Starting Quest...");
-
     moduleParams.element = div;
     moduleParams.store = params.store ? params.store : store;
     moduleParams.updateTree = params.updateTree ? params.updateTree : updateTree;
@@ -23,14 +21,12 @@ export async function generate(text, div, params) {
 
     await parseMarkdown(text);
 
-
-    // would we want to retrieve and tree before or after parsing?
     
     if(params.retrieve) {
-
         // define outside retrieve() rules
     }
     else {
+        //should this go in storage?
         let results = await localforage.getItem(moduleParams.name);
         if(results) await restore(results);
     }
@@ -40,6 +36,7 @@ export async function generate(text, div, params) {
         queue.loadFromJSON(params.treeJSON);
     } 
     else {
+        // should this go in storage?
         await localforage.getItem(moduleParams.name + ".treeJSON").then((tree) => {
             if (tree) {
                 queue.loadFromVanillaObject(tree);

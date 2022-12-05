@@ -1,4 +1,5 @@
 export class Questionnaire {
+    
     constructor() {
         this.stack = [];
     };
@@ -18,10 +19,6 @@ export class Questionnaire {
         return this.stack[0];
     }
 
-    get() {
-        return this.stack;
-    }
-
     getNext(previousQuestion) {
         let index = this.stack.indexOf(previousQuestion);
         return this.stack[index + 1];
@@ -34,7 +31,25 @@ export class Questionnaire {
   
 
 class Question {
+    
     constructor(params) {
         this.params = params;
+        this.answer = [];
     };
+
+    clearAnswer() {
+        this.answer = [];
+    }
+
+    getAnswer() {
+
+    }
+
+    restoreAnswer(answer) {
+        this.answer = answer;
+    }
+
+    setAnswer() {
+
+    }
 }

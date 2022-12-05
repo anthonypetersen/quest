@@ -2,38 +2,44 @@ import { moduleParams, questions, queue } from "./quest.js";
 
 export function startModule() {
 
-    if(questions.get().length > 0) {
+    if(questions.stack.length > 0) {
         if(queue.isEmpty()) {
             queue.add(questions.first().params.id);
         }
 
-        nextQuestion();
+        let questionToRender = queue.currentNode.value;
+
+        displayQuestion(questionToRender);
     }
 }
 
 function nextQuestion() {
     
+    // set answers
+    // store (save)
+
+
     if(queue.next().done) {
         let currentQuestion = questions.find(queue.currentNode.value);
         let nextQuestion = questions.getNext(currentQuestion);
         queue.add(nextQuestion.params.id);
         queue.next();
     }
+
+    // update tree
     
     let questionToRender = queue.currentNode.value;
-
-    // save results
-    // save tree
-
     displayQuestion(questionToRender);
-
 }
 
 function previousQuestion() {
 
+    // clear answers
+    // store (remove)
+
     queue.previous();
 
-    // clear answers
+
     // update tree
 
     let questionToRender = queue.currentNode.value;
@@ -51,7 +57,6 @@ function displayQuestion(questionId) {
     document.getElementById("active-question").innerHTML = renderQuestion(question);
     document.getElementById("buttons").innerHTML = renderButtons(question);
     addListeners();
-
 }
 
 function renderButtons(question) {
