@@ -5,6 +5,7 @@ export function startModule() {
     if(questions.stack.length > 0) {
         if(queue.isEmpty()) {
             queue.add(questions.first().params.id);
+            queue.next();
         }
 
         let questionToRender = queue.currentNode.value;
@@ -13,15 +14,16 @@ export function startModule() {
     }
 }
 
-function nextQuestion() {
+async function nextQuestion() {
     
-    // set answers
-    // store (save)
+    let currentQuestion = questions.find(queue.currentNode.value);
+    currentQuestion.setAnswer();
+
+    // await store(currentQuestion, "save");
 
 
     if(queue.next().done) {
-        let currentQuestion = questions.find(queue.currentNode.value);
-        let nextQuestion = questions.getNext(currentQuestion);
+        let nextQuestion = questions.next(currentQuestion);
         queue.add(nextQuestion.params.id);
         queue.next();
     }
@@ -57,6 +59,8 @@ function displayQuestion(questionId) {
     document.getElementById("active-question").innerHTML = renderQuestion(question);
     document.getElementById("buttons").innerHTML = renderButtons(question);
     addListeners();
+
+    question.getAnswer();
 }
 
 function renderButtons(question) {
