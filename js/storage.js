@@ -17,7 +17,7 @@ export async function initialize() {
 }
 
 export async function store(question, action) {
-    //let responses = await localforage.getItem(questName);
+    let responses = await localResults.getItem(localResults.config().storeName);
 
 	if(action === "save") {
 
@@ -26,16 +26,15 @@ export async function store(question, action) {
 		}
 
 		if(question.answer.length > 0) {
-			responses[question.id] = question.answer;
-			localforage.setItem(questName, responses);
+			responses[question.params.id] = question.answer;
+			localResults.setItem(localResults.config().storeName, responses);
 		}
 	}
 	else if(action === "remove") {
-		let responses = await localforage.getItem(questName);
 
-		if(responses && responses[question.id]) {
-			delete responses[question.id];
-			localforage.setItem(questName, responses);
+		if(responses && responses[question.params.id]) {
+			delete responses[question.params.id];
+			localResults.setItem(localResults.config().storeName, responses);
 		}
 	}
 	else {
@@ -52,6 +51,5 @@ export function restore(results) {
 }
 
 export async function updateTree() {
-	await localforage.setItem(moduleParams.questName + ".treeJSON", questionQueue.toVanillaObject());
-    // await localTree.set(queue.toVanillaObject);
+	await localTree.setItem(localTree.config().storeName, queue.toVanillaObject());
 }

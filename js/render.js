@@ -1,4 +1,5 @@
 import { moduleParams, questions, queue } from "./quest.js";
+import { store, updateTree } from "./storage.js";
 
 export function startModule() {
 
@@ -19,8 +20,7 @@ async function nextQuestion() {
     let currentQuestion = questions.find(queue.currentNode.value);
     currentQuestion.setAnswer();
 
-    // await store(currentQuestion, "save");
-
+    await store(currentQuestion, "save");
 
     if(queue.next().done) {
         let nextQuestion = questions.next(currentQuestion);
@@ -28,21 +28,24 @@ async function nextQuestion() {
         queue.next();
     }
 
-    // update tree
+    //what if we aren't done?
+
+    await updateTree();
     
     let questionToRender = queue.currentNode.value;
     displayQuestion(questionToRender);
 }
 
-function previousQuestion() {
+async function previousQuestion() {
 
-    // clear answers
-    // store (remove)
+    let currentQuestion = questions.find(queue.currentNode.value);
+    currentQuestion.clearAnswer();
+    
+    await store(currentQuestion, "remove");
 
     queue.previous();
 
-
-    // update tree
+    await updateTree();
 
     let questionToRender = queue.currentNode.value;
     displayQuestion(questionToRender);
