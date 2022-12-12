@@ -17,7 +17,7 @@ async function quest() {
     var urlButton = document.getElementById("uploadURL");
 
     urlButton.onclick = async (event) => {
-        let url = "https://raw.githubusercontent.com/anthonypetersen/quest/simplify/testing.txt";
+        let url = "https://raw.githubusercontent.com/anthonypetersen/quest/main/testing.txt";
         ta.value = await (await fetch(url)).text();
         ta.onkeyup();
     }
