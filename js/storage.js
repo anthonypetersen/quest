@@ -1,4 +1,4 @@
-import { moduleParams, queue } from "./quest.js";
+import { moduleParams, queue, questions } from "./quest.js";
 
 export let localResults = {};
 export let localTree = {};
@@ -45,8 +45,24 @@ export async function store(question, action) {
 export function restore(results) {
     
     Object.keys(results).forEach((qid) => {
-		let question = survey.find(qid);
+		let question = questions.find(qid);
 		question.restoreAnswer(results[qid]);
+	});
+}
+
+export async function retrieve() {
+	let results = await localResults.getItem(localResults.config().storeName);
+    if(results) await restore(results);
+}
+
+export async function setTree() {
+	await localTree.getItem(localTree.config().storeName).then((tree) => {
+		if (tree) {
+			queue.loadFromVanillaObject(tree);
+		} 
+		else {
+			queue.clear();
+		}
 	});
 }
 

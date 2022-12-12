@@ -14,11 +14,8 @@ export async function parseMarkdown(text) {
     let markdownSplit = splitQuestions(text);
 
     markdownSplit.forEach(question => {
-        let results;
         
-        //questions.add(question);
-
-        //want to check if question, loop, or grid
+        let results;
 
         //if grid
         //else if loop

@@ -1,7 +1,9 @@
 import { moduleParams, questions, queue } from "./quest.js";
 import { store, updateTree } from "./storage.js";
 
-export function startModule() {
+export async function startModule() {
+
+    await moduleParams.retrieve();
 
     if(questions.stack.length > 0) {
         if(queue.isEmpty()) {
@@ -49,10 +51,6 @@ async function previousQuestion() {
 
     let questionToRender = queue.currentNode.value;
     displayQuestion(questionToRender);
-}
-
-function submitQuestionnaire() {
-
 }
 
 function displayQuestion(questionId) {

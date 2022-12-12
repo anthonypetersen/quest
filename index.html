@@ -26,8 +26,6 @@
                     <div class="row" id="options">
                         <span class="h4">Options 
                             <span id="buttonSpan">
-                                <input type="button" id="updateMemory" value="Add JSON to Memory" onclick="addMemory()" />
-                                <input type="button" id="clearMemory" value="Clear Memory" onclick="clearMemory()" />
                                 <input type="button" id="uploadURL" value="URL" onclick="getURL()" />
                             </span>
                         </span>
@@ -35,27 +33,13 @@
                         <textarea id="prev"></textarea>
                     </div>
                     <div class="row" id="markup">
-                        <span class="h4">Markup 
-                            <span class="h4" id="fontSpan">Change Font Size 
-                                <span>
-                                    <button id="increaseSizeButton" class="fa fa-plus-square-o" onclick="increaseSize()"></button> 
-                                    <button id="decreaseSizeButton" class="fa fa-minus-square-o" onclick="decreaseSize()"></button>
-                                </span>
-                            </span>
-                        </span>
-
+                        <span class="h4">Markup</span>
                         <textarea id="ta"></textarea>
                     </div>
                 </div>
                 <div class="col-8">
                     <div class="col" id="render">
-                        <span class="h4">Rendering 
-                            <span id="checkboxSpan">
-                                <input type="checkbox" id="logic" onclick="changeLogic()">Logic</input>
-                                <input type="checkbox" id="styling" onclick="changeStyle()">Styling</input>
-                            </span>
-                        </span>
-
+                        <span class="h4">Rendering</span>
                         <div id="rendering"></div>
                     </div>
                 </div>
