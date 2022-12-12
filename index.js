@@ -1,10 +1,5 @@
 function changeStyle() {
-    if(document.getElementById("styling").checked) {
-        document.getElementById("pagestyle").setAttribute("href", 'Style1.css');
-    }
-    else {
-        document.getElementById("pagestyle").setAttribute("href", 'Default.css');
-    }
+    document.getElementById("pagestyle").setAttribute("href", './css/Custom.css');
 }
 
 async function getURL() {
