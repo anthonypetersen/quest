@@ -2,6 +2,11 @@ import { moduleParams, questions } from "./quest.js";
 import { initialize } from "./storage.js";
 import regex from "./regex.js";
 
+/**
+ * Splits text markdown into individual questions and validates them before adding to global questionnaire
+ *
+ * @param {string} text markdown containing structure of questionnaire to render
+ */
 export async function parseMarkdown(text) {
 
     console.log("Parsing markdown...");
@@ -30,6 +35,11 @@ export async function parseMarkdown(text) {
     });
 }
 
+/**
+ * Attempts to find the name of the questionnaire and set correlating module parameter
+ *
+ * @param {string} text markdown containing structure of questionnaire to render
+ */
 function extractModuleName(text) {
 
     let match = text.match(regex.moduleName);
@@ -38,6 +48,12 @@ function extractModuleName(text) {
     console.log("Setting module name: " + moduleParams.name);
 }
 
+/**
+ * Breaks up text markdown based on regular expressions for normal, loop, and grid questions
+ *
+ * @param {string} text markdown containing structure of questionnaire to render
+ * @returns {array} questions parsed from text markdown
+ */
 function splitQuestions(text) {
     
     let postLoop = [];
@@ -70,12 +86,24 @@ function splitQuestions(text) {
     return postQuestion;
 }
 
+/**
+ * Performs a handleful of replace() transactions to cleanup markdown text passed in
+ *
+ * @param {string} text markdown containing structure of questionnaire to render
+ * @returns {string} cleaned text markdown
+ */
 function prepareMarkdown(text) {
     text = text.replace(/[\r\n]/gm, '');
 
     return text;
 }
 
+/**
+ * Verifies if markdown for normal quesion matches what is required, if so sets question parameters
+ *
+ * @param {string} text markdown containing structure of normal question to be rendered
+ * @returns {object} question parameters if markdown is valid, else FALSE
+ */
 function validateQuestion(text) {
 
     let match = text.match(regex.questionSpecific);
@@ -99,10 +127,22 @@ function validateQuestion(text) {
     return false;
 }
 
+/**
+ * Verifies if markdown for loop quesion matches what is required, if so sets question parameters
+ *
+ * @param {string} text markdown containing structure of loop question to be rendered
+ * @returns {object} question parameters if markdown is valid, else FALSE
+ */
 function validateLoop(text) {
     
 }
 
+/**
+ * Verifies if markdown for grid quesion matches what is required, if so sets question parameters
+ *
+ * @param {string} text markdown containing structure of grid question to be rendered
+ * @returns {object} question parameters if markdown is valid, else FALSE
+ */
 function validateGrid(text) {
 
 }

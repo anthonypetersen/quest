@@ -10,6 +10,13 @@ export const questions = new Questionnaire();
 export const queue = new Tree();
 export const moduleParams = {};
 
+/**
+ * Trigger point for starting Quest. Sets module parameters, parses markdown, sets the tree, and starts the module.
+ *
+ * @param {string} text markdown containing structure of normal question to be rendered
+ * @param {string} div name of DOM element that will render questionnaire
+ * @param {string} params external module parameters to be used by Quest internally
+ */
 export async function generate(text, div, params) {
 
     moduleParams.element = div;
